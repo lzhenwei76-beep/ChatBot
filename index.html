@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AI Chat • Intelligenter Assistent</title>
+
+<!-- Highlight.js für Syntax-Highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<!-- Alle Sprachen auf einmal laden -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/shell.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/html.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ruby.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dockerfile.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js"></script>
+
+<style>
+:root {
+  --bg: #0f172a;
+  --box: #111827;
+  --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --user: #3b82f6;
+  --ai: #1e293b;
+  --border: #334155;
+  --input-bg: #1e293b;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --transition: all 0.3s ease;
+  --dropdown-bg: #1e293b;
+  --dropdown-hover: #2d3a4f;
+  --code-bg: #1a1a2e;
+  --code-border: #2a2a4e;
+}
+
+body.light {
+  --bg: #f8fafc;
+  --box: #ffffff;
+  --text: #0f172a;
+  --text-secondary: #64748b;
+  --user: #2563eb;
+  --ai: #f1f5f9;
+  --border: #e2e8f0;
+  --input-bg: #f8fafc;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --dropdown-bg: #ffffff;
+  --dropdown-hover: #f1f5f9;
+  --code-bg: #f6f8fa;
+  --code-border: #d0d7de;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  transition: var(--transition);
+  padding: 16px;
+}
+
+.box {
+  width: 100%;
+  max-width: 500px;
+  height: 700px;
+  background: var(--box);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 10px 40px var(--shadow);
+  transition: var(--transition);
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+@media (max-width: 500px) {
+  body {
+    padding: 0;
+  }
+  
+  .box {
+    width: 100%;
+    height: 100vh;
+    max-height: -webkit-fill-available;
+    border-radius: 0;
+    border: none;
+  }
+}
+
+/* Header */
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--box);
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.top-left h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.model-badge {
+  background: var(--ai);
+  padding: 3px 8px;
+  border-radius: 16px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.top-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: var(--transition);
+}
+
+.icon-btn:hover {
+  background: var(--ai);
+}
+
+/* Chat Bereich */
+.chat {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+
+.chat::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* Nachrichten */
+.msg-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.msg {
+  padding: 10px 14px;
+  border-radius: 16px;
+  max-width: 90%;
+  word-wrap: break-word;
+  line-height: 1.4;
+  font-size: 0.9rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.msg-content {
+  width: 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user {
+  background: var(--user);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.ai {
+  background: var(--ai);
+  color: var(--text);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+/* Kompakte Code-Blöcke */
+.code-block {
+  margin: 6px 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  font-size: 0.8rem;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  background: var(--code-bg);
+  border-bottom: 1px solid var(--code-border);
+}
+
+.code-language {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copy-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: var(--transition);
+}
+
+.copy-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.copy-btn.copied {
+  color: var(--success);
+}
+
+.code-content {
+  padding: 8px;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.code-content pre {
+  margin: 0;
+}
+
+.code-content code {
+  font-family: inherit;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* Inline-Code */
+.inline-code {
+  background: var(--code-bg);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 0.8em;
+}
+
+/* Terminal-Blöcke - Kompakt */
+.terminal-block {
+  margin: 6px 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #1a1a2e;
+  border: 1px solid #2a2a4e;
+  font-size: 0.8rem;
+}
+
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  background: #16213e;
+  border-bottom: 1px solid #2a2a4e;
+}
+
+.terminal-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.terminal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.terminal-dot.red { background: #ff5f56; }
+.terminal-dot.yellow { background: #ffbd2e; }
+.terminal-dot.green { background: #27c93f; }
+
+.terminal-label {
+  font-size: 0.65rem;
+  color: #94a3b8;
+}
+
+.terminal-content {
+  padding: 8px;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #00ff9d;
+  background: #1a1a2e;
+  overflow-x: auto;
+}
+
+.terminal-content .command {
+  color: #00ff9d;
+}
+
+.terminal-content .output {
+  color: #e2e8f0;
+}
+
+.terminal-content .prompt {
+  color: #00ff9d;
+  margin-right: 6px;
+}
+
+/* Highlight.js Overrides - Kompakter */
+.hljs {
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 0.75rem !important;
+  line-height: 1.4 !important;
+}
+
+/* Light Mode für Terminal */
+body.light .terminal-block {
+  background: #f6f8fa;
+  border-color: #d0d7de;
+}
+
+body.light .terminal-header {
+  background: #f6f8fa;
+  border-bottom-color: #d0d7de;
+}
+
+body.light .terminal-content {
+  background: #ffffff;
+  color: #24292f;
+}
+
+body.light .terminal-content .command {
+  color: #0969da;
+}
+
+body.light .terminal-content .output {
+  color: #57606a;
+}
+
+.msg-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+  padding: 0 4px;
+}
+
+.msg-time {
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+}
+
+.msg-tokens {
+  font-size: 0.55rem;
+  color: var(--text-secondary);
+  background: var(--bg);
+  padding: 1px 4px;
+  border-radius: 8px;
+}
+
+/* Token Panel - Kompakter */
+.token-panel {
+  background: var(--ai);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+}
+
+.token-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.token-header h3 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.close-panel {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 2px;
+}
+
+.token-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--user);
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+}
+
+.token-progress {
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), var(--user));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.token-details {
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 0.7rem;
+}
+
+/* Tippindikator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 12px;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  animation: typing 1.4s infinite;
+}
+
+/* Eingabebereich - Kompakter */
+.bottom {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--box);
+}
+
+.model-selector {
+  margin-bottom: 8px;
+}
+
+.select-header {
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+.selected-option {
+  gap: 6px;
+}
+
+.model-icon {
+  font-size: 1rem;
+}
+
+.model-name {
+  font-size: 0.85rem;
+}
+
+.select-options {
+  bottom: calc(100% + 6px);
+  max-height: 300px;
+  border-radius: 10px;
+}
+
+.option {
+  padding: 8px 12px;
+}
+
+.option-name {
+  font-size: 0.85rem;
+}
+
+.option-details {
+  font-size: 0.6rem;
+}
+
+.select-search input {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+}
+
+.input-container {
+  gap: 6px;
+}
+
+textarea {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  max-height: 100px;
+}
+
+.send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  font-size: 1.1rem;
+}
+
+.char-counter {
+  font-size: 0.65rem;
+  margin-top: 3px;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 20px;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.empty-title {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.empty-text {
+  font-size: 0.8rem;
+}
+
+/* Toast */
+.toast {
+  bottom: 70px;
+  padding: 10px 16px;
+  font-size: 0.8rem;
+}
+
+#model {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="dropdown-overlay" id="dropdownOverlay" onclick="closeDropdown()"></div>
+
+<div class="box">
+  <div class="top">
+    <div class="top-left">
+      <span>🤖</span>
+      <h1>AI Chat</h1>
+      <span class="model-badge" id="currentModelBadge">GPT-4</span>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" onclick="toggleTokenPanel()" title="Tokens">📊</button>
+      <button class="icon-btn" onclick="clearChat()" title="Leeren">🗑️</button>
+      <button class="icon-btn" onclick="toggleTheme()" id="themeToggle" title="Theme">🌙</button>
+    </div>
+  </div>
+
+  <div class="chat" id="chat">
+    <div class="token-panel" id="tokenPanel" style="display: none;">
+      <div class="token-header">
+        <h3><span>📊</span> Token-Verbrauch</h3>
+        <button class="close-panel" onclick="toggleTokenPanel()">✕</button>
+      </div>
+      
+      <div class="token-stats">
+        <div class="token-stat">
+          <div class="stat-label">Verbraucht</div>
+          <div class="stat-value" id="totalTokensUsed">0</div>
+        </div>
+        <div class="token-stat">
+          <div class="stat-label">Verfügbar</div>
+          <div class="stat-value" id="totalTokensAvailable">128K</div>
+        </div>
+      </div>
+      
+      <div class="token-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" id="tokenProgressBar" style="width: 0%"></div>
+        </div>
+      </div>
+      
+      <div class="token-details">
+        <div class="detail-row">
+          <span>📝 Eingabe</span>
+          <span id="inputTokens">0</span>
+        </div>
+        <div class="detail-row">
+          <span>🤖 Ausgabe</span>
+          <span id="outputTokens">0</span>
+        </div>
+        <div class="detail-row">
+          <span>💬 Nachrichten</span>
+          <span id="messageCount">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state">
+      <div class="empty-icon">💬</div>
+      <div class="empty-title">Willkommen!</div>
+      <div class="empty-text">Wähle ein Modell und starte den Chat</div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="model-selector">
+      <div class="custom-select" id="customSelect">
+        <div class="select-header" onclick="toggleDropdown(event)">
+          <div class="selected-option">
+            <span class="model-icon">🤖</span>
+            <span>
+              <span class="model-name" id="selectedModelName">GPT-4</span>
+              <span class="model-provider" id="selectedModelProvider"></span>
+            </span>
+          </div>
+          <span class="select-arrow">▲</span>
+        </div>
+        <div class="select-options" id="selectOptions">
+          <div class="select-search">
+            <input type="text" id="modelSearch" placeholder="🔍 Suchen..." oninput="filterModels()" onclick="event.stopPropagation()">
+          </div>
+          <div id="optionsList"></div>
+        </div>
+      </div>
+      <select id="model" style="display: none;"></select>
+    </div>
+    
+    <div class="input-container">
+      <div class="input-wrapper">
+        <textarea id="input" placeholder="Nachricht..." rows="1" maxlength="4000" oninput="autoResize(this); updateCharCount()"></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+    </div>
+    <div class="char-counter">
+      <span id="charCount">0 Zeichen</span>
+      <span id="tokenPreview">~0 Tokens</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// State
+let isGenerating = false;
+let messageHistory = [];
+let availableModels = [];
+let selectedModelId = '';
+let dropdownOpen = false;
+let tokenPanelVisible = false;
+
+let tokenStats = {
+  inputTokens: 0,
+  outputTokens: 0,
+  messageCount: 0
+};
+
+const modelLimits = {
+  'gpt-4': 128000, 'gpt-4-turbo': 128000, 'gpt-3.5-turbo': 16000,
+  'claude-3': 200000, 'gemini-pro': 32000, 'default': 128000
+};
+
+// DOM Elements
+const chatContainer = document.getElementById('chat');
+const inputField = document.getElementById('input');
+const sendBtn = document.getElementById('sendBtn');
+const themeToggle = document.getElementById('themeToggle');
+const currentModelBadge = document.getElementById('currentModelBadge');
+const charCountSpan = document.getElementById('charCount');
+const tokenPreview = document.getElementById('tokenPreview');
+const selectHeader = document.querySelector('.select-header');
+const selectOptions = document.getElementById('selectOptions');
+const optionsList = document.getElementById('optionsList');
+const modelSearch = document.getElementById('modelSearch');
+const selectedModelName = document.getElementById('selectedModelName');
+const selectedModelProvider = document.getElementById('selectedModelProvider');
+const tokenPanel = document.getElementById('tokenPanel');
+
+// Formatierung
+function formatModelName(modelId) {
+  const parts = modelId.split('/');
+  return parts[parts.length - 1];
+}
+
+function extractProvider(modelId) {
+  const parts = modelId.split('/');
+  return parts.length > 1 ? parts[0] : null;
+}
+
+function detectLanguage(code) {
+  const patterns = {
+    'python': /^(import |from |def |class |print\(|if __name__)/m,
+    'javascript': /^(const |let |var |function |=>|console\.log)/m,
+    'typescript': /^(interface |type |enum |:\s*(string|number))/m,
+    'bash': /^(#!\/bin\/bash|\$ |sudo |apt-get)/m,
+    'html': /^(<!DOCTYPE|<html|<div)/m,
+    'css': /^([.#][\w-]+\s*{|@media)/m,
+    'sql': /^(SELECT |INSERT |UPDATE |DELETE )/mi,
+    'java': /^(public class |private |import java\.)/m,
+    'cpp': /^(#include |int main|std::)/m,
+    'go': /^(package |func |import )/m,
+    'rust': /^(fn |let mut |impl |pub )/m,
+    'json': /^[{\[]/,
+    'yaml': /^[\w-]+:\s/m
+  };
+  
+  for (const [lang, pattern] of Object.entries(patterns)) {
+    if (pattern.test(code)) return lang;
+  }
+  return 'plaintext';
+}
+
+function formatMessage(text) {
+  // Code-Blöcke
+  let formatted = text.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+    const language = lang || detectLanguage(code);
+    const escapedCode = escapeHtml(code.trim());
+    
+    return `
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-language">${language}</span>
+          <button class="copy-btn" onclick="copyCode(this, '${escapedCode.replace(/'/g, "\\'")}')">📋</button>
+        </div>
+        <div class="code-content">
+          <pre><code class="language-${language}">${escapedCode}</code></pre>
+        </div>
+      </div>
+    `;
+  });
+  
+  // Terminal-Blöcke
+  formatted = formatted.replace(/```(?:terminal|bash|shell)?\n?((?:\$|#|>)\s+[^\n]+\n?(?:[^$#>]+\n?)*)/g, (match, content) => {
+    const lines = content.split('\n');
+    const terminalContent = lines.map(line => {
+      if (line.match(/^(\$|#|>)\s+/)) {
+        return `<div class="command"><span class="prompt">${line.match(/^(\$|#|>)/)[0]}</span>${escapeHtml(line.replace(/^(\$|#|>)\s+/, ''))}</div>`;
+      } else if (line.trim()) {
+        return `<div class="output">${escapeHtml(line)}</div>`;
+      }
+      return '';
+    }).join('');
+    
+    return `
+      <div class="terminal-block">
+        <div class="terminal-header">
+          <div class="terminal-title">
+            <div class="terminal-dots">
+              <span class="terminal-dot red"></span>
+              <span class="terminal-dot yellow"></span>
+              <span class="terminal-dot green"></span>
+            </div>
+            <span class="terminal-label">Terminal</span>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this, '${escapeHtml(content).replace(/'/g, "\\'")}')">📋</button>
+        </div>
+        <div class="terminal-content">${terminalContent}</div>
+      </div>
+    `;
+  });
+  
+  // Inline-Code und Zeilenumbrüche
+  formatted = formatted.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+  return formatted.replace(/\n/g, '<br>');
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function copyCode(button, code) {
+  const unescapedCode = code.replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+  navigator.clipboard.writeText(unescapedCode).then(() => {
+    button.classList.add('copied');
+    button.textContent = '✓';
+    setTimeout(() => {
+      button.classList.remove('copied');
+      button.textContent = '📋';
+    }, 1500);
+  });
+}
+
+// Token Management
+function calculateTokens(text) {
+  return Math.ceil(text.length / 3.8);
+}
+
+function updateTokenStats(inputTokens = 0, outputTokens = 0) {
+  tokenStats.inputTokens += inputTokens;
+  tokenStats.outputTokens += outputTokens;
+  tokenStats.messageCount = messageHistory.filter(m => m.role === 'user').length;
+  updateTokenDisplay();
+  localStorage.setItem('tokenStats', JSON.stringify(tokenStats));
+}
+
+function updateTokenDisplay() {
+  const totalUsed = tokenStats.inputTokens + tokenStats.outputTokens;
+  const limit = getModelLimit();
+  const percentage = Math.min((totalUsed / limit) * 100, 100);
+  
+  document.getElementById('totalTokensUsed').textContent = formatNumber(totalUsed);
+  document.getElementById('totalTokensAvailable').textContent = formatNumber(limit);
+  document.getElementById('inputTokens').textContent = formatNumber(tokenStats.inputTokens);
+  document.getElementById('outputTokens').textContent = formatNumber(tokenStats.outputTokens);
+  document.getElementById('messageCount').textContent = tokenStats.messageCount;
+  document.getElementById('tokenProgressBar').style.width = `${percentage}%`;
+}
+
+function getModelLimit() {
+  const modelLower = selectedModelId.toLowerCase();
+  for (const [key, limit] of Object.entries(modelLimits)) {
+    if (modelLower.includes(key)) return limit;
+  }
+  return modelLimits.default;
+}
+
+function formatNumber(num) {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+  return num.toString();
+}
+
+// Dropdown
+function toggleDropdown(event) {
+  event.stopPropagation();
+  dropdownOpen ? closeDropdown() : openDropdown();
+}
+
+function openDropdown() {
+  dropdownOpen = true;
+  selectHeader.classList.add('active');
+  selectOptions.classList.add('show');
+  document.getElementById('dropdownOverlay').classList.add('show');
+  modelSearch.value = '';
+  filterModels();
+  setTimeout(() => modelSearch.focus(), 100);
+  selectHeader.querySelector('.select-arrow').style.transform = 'rotate(180deg)';
+}
+
+function closeDropdown() {
+  dropdownOpen = false;
+  selectHeader.classList.remove('active');
+  selectOptions.classList.remove('show');
+  document.getElementById('dropdownOverlay').classList.remove('show');
+  selectHeader.querySelector('.select-arrow').style.transform = 'rotate(0deg)';
+}
+
+function filterModels() {
+  const searchTerm = modelSearch.value.toLowerCase();
+  const filtered = availableModels.filter(model => {
+    const modelName = formatModelName(model.id);
+    const provider = extractProvider(model.id);
+    return modelName.toLowerCase().includes(searchTerm) ||
+           (provider && provider.toLowerCase().includes(searchTerm));
+  });
+  renderOptions(filtered);
+}
+
+function renderOptions(models) {
+  if (models.length === 0) {
+    optionsList.innerHTML = '<div class="no-results">Keine Modelle</div>';
+    return;
+  }
+
+  optionsList.innerHTML = models.map(model => {
+    const isSelected = model.id === selectedModelId;
+    const provider = model.owned_by || extractProvider(model.id) || '';
+    const displayName = formatModelName(model.id);
+    const icon = getModelIcon(model.id);
+    
+    return `
+      <div class="option ${isSelected ? 'selected' : ''}" onclick="selectModel('${model.id}', '${provider}')">
+        <span class="option-icon">${icon}</span>
+        <div class="option-content">
+          <div class="option-name" title="${model.id}">${displayName}</div>
+          ${provider ? `<div class="option-details">${provider}</div>` : ''}
+        </div>
+        <span class="option-check">✓</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function getModelIcon(modelId) {
+  const lower = modelId.toLowerCase();
+  if (lower.includes('gpt-4')) return '🧠';
+  if (lower.includes('gpt-3.5')) return '⚡';
+  if (lower.includes('claude')) return '🎯';
+  if (lower.includes('gemini')) return '🌟';
+  return '🤖';
+}
+
+function selectModel(modelId, provider) {
+  selectedModelId = modelId;
+  document.getElementById('model').value = modelId;
+  
+  const displayName = formatModelName(modelId);
+  selectedModelName.textContent = displayName;
+  selectedModelName.title = modelId;
+  selectedModelProvider.textContent = provider ? ` (${provider})` : '';
+  currentModelBadge.textContent = displayName.split('-')[0] || displayName;
+  
+  updateTokenDisplay();
+  closeDropdown();
+  renderOptions(availableModels);
+}
+
+// Theme
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  themeToggle.textContent = isLight ? '☀️' : '🌙';
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  
+  const themeLink = document.querySelector('link[href*="highlight.js"]');
+  if (themeLink) {
+    themeLink.href = isLight 
+      ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css'
+      : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css';
+  }
+}
+
+// UI Helpers
+function autoResize(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+}
+
+function updateCharCount() {
+  const count = inputField.value.length;
+  charCountSpan.textContent = `${count} Zeichen`;
+  tokenPreview.textContent = `~${Math.ceil(count / 4)} Tokens`;
+}
+
+function toggleTokenPanel() {
+  tokenPanelVisible = !tokenPanelVisible;
+  tokenPanel.style.display = tokenPanelVisible ? 'block' : 'none';
+  if (tokenPanelVisible) updateTokenDisplay();
+}
+
+function clearChat() {
+  if (confirm('Chat löschen?')) {
+    chatContainer.innerHTML = '';
+    messageHistory = [];
+    tokenStats = { inputTokens: 0, outputTokens: 0, messageCount: 0 };
+    updateTokenDisplay();
+    showEmptyState();
+  }
+}
+
+function showEmptyState() {
+  const emptyState = document.createElement('div');
+  emptyState.className = 'empty-state';
+  emptyState.innerHTML = `
+    <div class="empty-icon">💬</div>
+    <div class="empty-title">Willkommen!</div>
+    <div class="empty-text">Wähle ein Modell und starte den Chat</div>
+  `;
+  chatContainer.appendChild(emptyState);
+}
+
+function addMessage(text, type, tokens = null) {
+  const emptyState = chatContainer.querySelector('.empty-state');
+  if (emptyState) emptyState.remove();
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'msg-wrapper';
+  
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `msg ${type}`;
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'msg-content';
+  contentDiv.innerHTML = type === 'ai' ? formatMessage(text) : escapeHtml(text).replace(/\n/g, '<br>');
+  
+  msgDiv.appendChild(contentDiv);
+  
+  const footer = document.createElement('div');
+  footer.className = 'msg-footer';
+  footer.innerHTML = `
+    <div class="msg-time">${new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</div>
+    ${tokens ? `<div class="msg-tokens">${tokens} Tokens</div>` : ''}
+  `;
+  
+  wrapper.appendChild(msgDiv);
+  wrapper.appendChild(footer);
+  chatContainer.appendChild(wrapper);
+  
+  if (type === 'ai') {
+    wrapper.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+  }
+  
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  return wrapper;
+}
+
+function showTypingIndicator() {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'msg-wrapper';
+  wrapper.id = 'typingIndicator';
+  wrapper.innerHTML = `
+    <div class="msg ai typing-indicator">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  `;
+  chatContainer.appendChild(wrapper);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// API Calls
+async function loadModels() {
+  try {
+    const res = await fetch("http://localhost:3000/models");
+    const data = await res.json();
+
+    if (data.data?.length > 0) {
+      availableModels = data.data;
+      const firstModel = data.data[0];
+      const provider = firstModel.owned_by || extractProvider(firstModel.id) || '';
+      selectModel(firstModel.id, provider);
+      renderOptions(availableModels);
+    }
+  } catch (e) {
+    console.error('Fehler:', e);
+  }
+}
+
+async function sendMessage() {
+  const text = inputField.value.trim();
+  if (!text || isGenerating || !selectedModelId) return;
+
+  const inputTokens = calculateTokens(text);
+  
+  isGenerating = true;
+  sendBtn.disabled = true;
+  inputField.value = '';
+  updateCharCount();
+  autoResize(inputField);
+
+  addMessage(text, 'user', inputTokens);
+  messageHistory.push({ role: 'user', content: text });
+  updateTokenStats(inputTokens, 0);
+  showTypingIndicator();
+
+  try {
+    const res = await fetch("http://localhost:3000/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        model: selectedModelId,
+        history: messageHistory.slice(-10)
+      })
+    });
+
+    const data = await res.json();
+    document.getElementById('typingIndicator')?.remove();
+
+    if (data.choices?.[0]?.message?.content) {
+      const aiResponse = data.choices[0].message.content;
+      const outputTokens = data.usage?.completion_tokens || calculateTokens(aiResponse);
+      
+      addMessage(aiResponse, 'ai', outputTokens);
+      messageHistory.push({ role: 'assistant', content: aiResponse });
+      updateTokenStats(0, outputTokens);
+    }
+  } catch (e) {
+    document.getElementById('typingIndicator')?.remove();
+    addMessage('Fehler beim Senden', 'ai');
+  } finally {
+    isGenerating = false;
+    sendBtn.disabled = false;
+    inputField.focus();
+  }
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  loadModels();
+  
+  const savedStats = localStorage.getItem('tokenStats');
+  if (savedStats) {
+    try {
+      tokenStats = JSON.parse(savedStats);
+      updateTokenDisplay();
+    } catch (e) {}
+  }
+  
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light');
+    themeToggle.textContent = '☀️';
+  }
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dropdownOpen) closeDropdown();
+  });
+  
+  inputField.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+});
+
+// Globals
+window.toggleTheme = toggleTheme;
+window.clearChat = clearChat;
+window.sendMessage = sendMessage;
+window.autoResize = autoResize;
+window.updateCharCount = updateCharCount;
+window.toggleDropdown = toggleDropdown;
+window.selectModel = selectModel;
+window.filterModels = filterModels;
+window.toggleTokenPanel = toggleTokenPanel;
+window.closeDropdown = closeDropdown;
+window.copyCode = copyCode;
+</script>
+
+</body>
+</html>

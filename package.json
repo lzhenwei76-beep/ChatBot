@@ -5,5 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "groq-sdk": "^1.1.2"
   }
 }

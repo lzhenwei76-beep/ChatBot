@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AI Chat V2.5 • Intelligenter Assistent</title>
+<title>AI Chat V2.7 • Intelligenter Assistent</title>
 
 <!-- Highlight.js -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
@@ -22,8 +22,11 @@
   --success: #10b981;
   --error: #ef4444;
   --warning: #f59e0b;
+  --info: #3b82f6;
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   --radius: 12px;
+  --radius-sm: 8px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -76,6 +79,11 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
@@ -101,6 +109,11 @@ body {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
 }
 
 /* Sidebar */
@@ -170,7 +183,7 @@ body {
 .new-chat-btn:hover {
   background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .sidebar-content {
@@ -186,6 +199,25 @@ body {
   color: var(--text-secondary);
   margin-bottom: 12px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.section-title button:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .chat-list {
@@ -214,6 +246,10 @@ body {
 .chat-item.active {
   background: var(--primary);
   color: white;
+}
+
+.chat-item.pinned {
+  border-left: 3px solid var(--warning);
 }
 
 .chat-icon {
@@ -311,14 +347,14 @@ body {
   margin-bottom: 16px;
 }
 
-.import-btn, .export-btn {
+.import-btn, .export-btn, .share-btn {
   flex: 1;
   padding: 8px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text-primary);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -328,7 +364,7 @@ body {
   transition: var(--transition);
 }
 
-.import-btn:hover, .export-btn:hover {
+.import-btn:hover, .export-btn:hover, .share-btn:hover {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
@@ -345,6 +381,10 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 8px 0;
+}
+
+.setting-item:not(:last-child) {
+  border-bottom: 1px solid var(--border);
 }
 
 .setting-label {
@@ -470,7 +510,7 @@ body {
   max-height: 300px;
   overflow-y: auto;
   z-index: 100;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   display: none;
   transform-origin: top center;
 }
@@ -485,6 +525,9 @@ body {
   cursor: pointer;
   transition: var(--transition);
   animation: fadeIn 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .model-option:hover {
@@ -496,6 +539,19 @@ body {
   background: var(--primary);
   color: white;
   font-weight: 600;
+}
+
+.model-badge {
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  color: var(--text-secondary);
+}
+
+.model-option.selected .model-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
 }
 
 .model-search {
@@ -534,10 +590,17 @@ body {
   align-items: center;
   gap: 6px;
   transition: var(--transition);
+  position: relative;
 }
 
 .icon-btn:hover {
   background: var(--bg-tertiary);
+}
+
+.icon-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
 }
 
 /* Token Limit Anzeige */
@@ -585,7 +648,7 @@ body {
 
 /* Token Panel */
 .token-panel {
-  background: var(--ai);
+  background: var(--bg-secondary);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
@@ -699,6 +762,33 @@ body {
   margin-bottom: 8px;
 }
 
+.welcome-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.welcome-btn {
+  padding: 10px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+
+.welcome-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
 /* Messages */
 .message {
   display: flex;
@@ -724,6 +814,12 @@ body {
   font-size: 1rem;
   flex-shrink: 0;
   font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.message-avatar:hover {
+  transform: scale(1.1);
 }
 
 .message.user .message-avatar {
@@ -738,38 +834,44 @@ body {
 
 .message-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 4px;
   padding: 0 4px;
 }
 
-.message-copy-btn {
+.message-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.message:hover .message-actions {
+  opacity: 1;
+}
+
+.message-action-btn {
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
   color: var(--text-secondary);
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   display: flex;
   align-items: center;
   gap: 4px;
-  opacity: 0;
   transition: var(--transition);
 }
 
-.message:hover .message-copy-btn {
-  opacity: 1;
-}
-
-.message-copy-btn:hover {
+.message-action-btn:hover {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
 }
 
-.message-copy-btn.copied {
+.message-action-btn.copied {
   background: var(--success);
   color: white;
 }
@@ -788,6 +890,11 @@ body {
   border: none;
 }
 
+.message-bubble.editing {
+  border: 2px solid var(--warning);
+  animation: pulse-glow 1.5s infinite;
+}
+
 .message-footer {
   display: flex;
   gap: 12px;
@@ -800,6 +907,16 @@ body {
 .message.user .message-footer {
   justify-content: flex-end;
 }
+
+.message-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.message-status.sent { color: var(--text-secondary); }
+.message-status.delivered { color: var(--info); }
+.message-status.read { color: var(--success); }
 
 /* Code Blocks */
 .code-block {
@@ -874,11 +991,73 @@ body {
   font-weight: 500;
 }
 
+/* Markdown Styles */
+.markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 0.85rem;
+}
+
+.markdown-table th,
+.markdown-table td {
+  padding: 8px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.markdown-table th {
+  background: var(--bg-tertiary);
+  font-weight: 600;
+}
+
+.markdown-blockquote {
+  margin: 8px 0;
+  padding: 8px 16px;
+  border-left: 4px solid var(--primary);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  font-style: italic;
+}
+
+.markdown-list {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.markdown-hr {
+  margin: 16px 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
 /* Input Area */
 .input-area {
   padding: 20px 24px;
   border-top: 1px solid var(--border);
   background: var(--bg-primary);
+}
+
+.input-toolbar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.toolbar-btn {
+  padding: 6px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: var(--transition);
+}
+
+.toolbar-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .input-wrapper {
@@ -943,7 +1122,7 @@ body {
 .send-btn:hover:not(:disabled) {
   background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
 .send-btn:disabled {
@@ -970,12 +1149,83 @@ body {
   animation: spin 0.8s linear infinite;
 }
 
+.stop-btn {
+  padding: 14px 24px;
+  background: var(--error);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.stop-btn.visible {
+  display: flex;
+}
+
+.stop-btn:hover {
+  background: #dc2626;
+}
+
 .input-footer {
   display: flex;
   justify-content: space-between;
   margin-top: 8px;
   font-size: 0.7rem;
   color: var(--text-secondary);
+}
+
+/* Context Menu */
+.context-menu {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  display: none;
+  min-width: 180px;
+}
+
+.context-menu.show {
+  display: block;
+  animation: scaleIn 0.15s ease;
+}
+
+.context-menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.context-menu-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.context-menu-item.danger {
+  color: var(--error);
+}
+
+.context-menu-item.danger:hover {
+  background: var(--error);
+  color: white;
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
 }
 
 /* Modal */
@@ -1023,10 +1273,12 @@ body {
   font-size: 1.5rem;
   cursor: pointer;
   font-weight: 700;
+  transition: var(--transition);
 }
 
 .modal-close:hover {
   color: var(--error);
+  transform: rotate(90deg);
 }
 
 .modal-body {
@@ -1101,29 +1353,67 @@ body {
   color: var(--text-primary);
 }
 
+.modal-btn.danger {
+  background: var(--error);
+  color: white;
+}
+
 /* Toast */
-.toast {
+.toast-container {
   position: fixed;
   bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 24px;
-  background: var(--success);
-  color: white;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  box-shadow: var(--shadow);
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   z-index: 1001;
-  animation: slideUp 0.3s ease;
+}
+
+.toast {
+  padding: 12px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideLeft 0.3s ease;
+  max-width: 350px;
+}
+
+.toast.success {
+  border-left: 4px solid var(--success);
 }
 
 .toast.error {
-  background: var(--error);
+  border-left: 4px solid var(--error);
 }
 
 .toast.warning {
-  background: var(--warning);
+  border-left: 4px solid var(--warning);
+}
+
+.toast.info {
+  border-left: 4px solid var(--info);
+}
+
+.toast-icon {
+  font-size: 1.2rem;
+}
+
+.toast-content {
+  flex: 1;
+  font-size: 0.85rem;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 2px;
 }
 
 /* Loading */
@@ -1150,6 +1440,30 @@ body {
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+/* Search Bar */
+.search-bar {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.search-result-count {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
 }
 
 /* Mobile */
@@ -1203,6 +1517,10 @@ body {
   .token-limit-indicator span:not(.token-count) {
     display: none;
   }
+  
+  .input-toolbar {
+    flex-wrap: wrap;
+  }
 }
 
 .editable-title {
@@ -1213,6 +1531,44 @@ body {
   color: var(--primary);
   text-decoration: underline;
 }
+
+/* Keyboard Shortcuts Modal */
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.shortcut-key {
+  padding: 4px 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+/* Regenerate Button */
+.regenerate-btn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+
+.regenerate-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
 </style>
 </head>
 
@@ -1220,19 +1576,44 @@ body {
 <div class="app">
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="app.closeSidebar()"></div>
 
+  <!-- Context Menu -->
+  <div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" onclick="app.contextMenuAction('copy')">
+      <span>📋</span> Kopieren
+    </div>
+    <div class="context-menu-item" onclick="app.contextMenuAction('edit')">
+      <span>✏️</span> Bearbeiten
+    </div>
+    <div class="context-menu-item" onclick="app.contextMenuAction('regenerate')">
+      <span>🔄</span> Neu generieren
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item danger" onclick="app.contextMenuAction('delete')">
+      <span>🗑️</span> Löschen
+    </div>
+  </div>
+
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo">
         <span>🤖</span>
-        <span class="logo-text">AI Chat V2.5</span>
+        <span class="logo-text">AI Chat V2.7</span>
       </div>
       <button class="new-chat-btn" onclick="app.createChat()">
         <span>➕</span> Neuer Chat
       </button>
     </div>
     
+    <div class="search-bar">
+      <input type="text" id="chatSearch" placeholder="🔍 Chats durchsuchen..." oninput="app.searchChats(this.value)">
+    </div>
+    
     <div class="sidebar-content">
-      <div class="section-title">Letzte Chats</div>
+      <div class="section-title">
+        <span>Letzte Chats</span>
+        <button onclick="app.sortChats('date')" title="Nach Datum sortieren">📅</button>
+        <button onclick="app.sortChats('name')" title="Nach Name sortieren">🔤</button>
+      </div>
       <div class="chat-list" id="chatList"></div>
     </div>
     
@@ -1263,6 +1644,9 @@ body {
         <button class="export-btn" onclick="app.exportAll()">
           <span>📤</span> Export
         </button>
+        <button class="share-btn" onclick="app.shareChat()">
+          <span>🔗</span> Teilen
+        </button>
       </div>
       
       <div class="settings-panel">
@@ -1275,6 +1659,12 @@ body {
         <div class="setting-item">
           <span class="setting-label">Auto-Scroll</span>
           <div class="toggle-switch active" id="autoScrollToggle" onclick="app.toggleAutoScroll()">
+            <div class="toggle-slider"></div>
+          </div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">Stream Antwort</span>
+          <div class="toggle-switch active" id="streamToggle" onclick="app.toggleStream()">
             <div class="toggle-slider"></div>
           </div>
         </div>
@@ -1311,13 +1701,13 @@ body {
       </div>
       
       <div class="header-actions">
+        <button class="icon-btn" onclick="app.showShortcuts()" title="Tastenkürzel">⌨️</button>
         <button class="icon-btn" onclick="app.exportCurrent()" title="Exportieren">📤</button>
         <button class="icon-btn" onclick="app.clearCurrent()" title="Leeren">🗑️</button>
       </div>
     </header>
     
     <div class="chat-container" id="chatContainer">
-      <!-- Token Panel -->
       <div class="token-panel" id="tokenPanel" style="display: none;">
         <div class="token-panel-header">
           <h3><span>🪙</span> Token Freemium</h3>
@@ -1346,18 +1736,38 @@ body {
       
       <div class="welcome-screen">
         <div class="welcome-icon">💬</div>
-        <div class="welcome-title">Willkommen bei <span class="logo-text" style="font-size: 2rem;">AI Chat V2.5</span></div>
+        <div class="welcome-title">Willkommen bei <span class="logo-text" style="font-size: 2rem;">AI Chat V2.7</span></div>
         <p>Wähle ein Modell und starte eine Unterhaltung</p>
         <p style="margin-top: 12px; font-size: 0.85rem;">🪙 Freemium: 1.000.000 Tokens kostenlos</p>
+        <div class="welcome-actions">
+          <button class="welcome-btn" onclick="app.createChat()">
+            <span>➕</span> Neuer Chat
+          </button>
+          <button class="welcome-btn" onclick="app.showShortcuts()">
+            <span>⌨️</span> Tastenkürzel
+          </button>
+        </div>
       </div>
     </div>
     
     <div class="input-area">
+      <div class="input-toolbar">
+        <button class="toolbar-btn" onclick="app.insertFormatting('**', '**')" title="Fett">B</button>
+        <button class="toolbar-btn" onclick="app.insertFormatting('*', '*')" title="Kursiv">I</button>
+        <button class="toolbar-btn" onclick="app.insertFormatting('`', '`')" title="Code">⌨️</button>
+        <button class="toolbar-btn" onclick="app.insertFormatting('```\n', '\n```')" title="Code Block">📦</button>
+        <button class="toolbar-btn" onclick="app.insertFormatting('- ', '')" title="Liste">📋</button>
+        <button class="toolbar-btn" onclick="app.insertFormatting('> ', '')" title="Zitat">💬</button>
+      </div>
       <div class="input-wrapper">
-        <textarea class="message-input" id="messageInput" placeholder="Nachricht schreiben..." rows="1" oninput="app.autoResize(this)"></textarea>
+        <textarea class="message-input" id="messageInput" placeholder="Nachricht schreiben... (Shift+Enter für neue Zeile)" rows="1" oninput="app.autoResize(this)"></textarea>
         <button class="send-btn" id="sendBtn" onclick="app.sendMessage()">
           <span>Senden</span>
           <span>➤</span>
+        </button>
+        <button class="stop-btn" id="stopBtn" onclick="app.stopGeneration()">
+          <span>⏹</span>
+          <span>Stop</span>
         </button>
       </div>
       <div class="input-footer">
@@ -1383,7 +1793,7 @@ body {
       </div>
       <input type="file" id="fileInput" class="file-input" accept=".json,application/json" onchange="app.handleFileSelect(event)">
       <p style="margin: 16px 0; color: var(--text-secondary); text-align: center; font-weight: 600;">— oder —</p>
-      <textarea class="modal-textarea" id="importTextarea" placeholder='{"version":"2.5","chats":[...]}'></textarea>
+      <textarea class="modal-textarea" id="importTextarea" placeholder='{"version":"2.7","chats":[...]}'></textarea>
     </div>
     <div class="modal-actions">
       <button class="modal-btn secondary" onclick="app.closeImportModal()">Abbrechen</button>
@@ -1409,8 +1819,39 @@ body {
   </div>
 </div>
 
+<!-- Shortcuts Modal -->
+<div class="modal-overlay" id="shortcutsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Tastenkürzel</h3>
+      <button class="modal-close" onclick="app.closeShortcutsModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="shortcuts-grid">
+        <span class="shortcut-key">Enter</span><span>Nachricht senden</span>
+        <span class="shortcut-key">Shift+Enter</span><span>Neue Zeile</span>
+        <span class="shortcut-key">Ctrl+K</span><span>Neuer Chat</span>
+        <span class="shortcut-key">Ctrl+F</span><span>Chats durchsuchen</span>
+        <span class="shortcut-key">Ctrl+Shift+C</span><span>Code kopieren</span>
+        <span class="shortcut-key">Ctrl+E</span><span>Chat exportieren</span>
+        <span class="shortcut-key">Ctrl+Shift+L</span><span>Chat leeren</span>
+        <span class="shortcut-key">Ctrl+/</span><span>Diese Hilfe</span>
+        <span class="shortcut-key">ESC</span><span>Menüs schließen</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
+// ============================================
+// AI CHAT V2.7 - Erweiterte Version
+// ============================================
+
 const App = {
+  // State
   chats: [],
   currentChatId: null,
   models: [],
@@ -1418,18 +1859,26 @@ const App = {
   isGenerating: false,
   modelDropdownOpen: false,
   autoScroll: true,
+  streamResponse: true,
   sidebarOpen: false,
   renameChatId: null,
   tokenPanelVisible: false,
+  abortController: null,
+  contextMenuTarget: null,
+  filteredChats: [],
+  sortOrder: 'date',
   
   // Token Freemium
-  TOKEN_LIMIT: 1000000, // 1M Tokens
+  TOKEN_LIMIT: 1000000,
   totalTokensUsed: 0,
   
+  // Model Pricing
   modelPricing: {
     'gpt-4': { input: 30, output: 60 },
     'gpt-4-turbo': { input: 10, output: 30 },
     'gpt-3.5-turbo': { input: 0.5, output: 1.5 },
+    'claude-3': { input: 15, output: 75 },
+    'gemini-pro': { input: 1.25, output: 5 },
     'default': { input: 10, output: 30 }
   },
   
@@ -1439,6 +1888,7 @@ const App = {
     this.loadModels();
     this.setupEventListeners();
     this.setupFileDrop();
+    this.setupKeyboardShortcuts();
     this.updateUI();
     this.updateToggleStates();
     this.updateTokenDisplay();
@@ -1457,6 +1907,12 @@ const App = {
       if (this.modelDropdownOpen && !e.target.closest('.model-selector')) {
         this.closeModelDropdown();
       }
+      
+      // Context menu schließen
+      const menu = document.getElementById('contextMenu');
+      if (!e.target.closest('.context-menu') && !e.target.closest('.message')) {
+        menu.classList.remove('show');
+      }
     });
     
     document.addEventListener('keydown', (e) => {
@@ -1465,20 +1921,160 @@ const App = {
         if (this.modelDropdownOpen) this.closeModelDropdown();
         this.closeImportModal();
         this.closeRenameModal();
+        this.closeShortcutsModal();
+        document.getElementById('contextMenu').classList.remove('show');
+      }
+    });
+    
+    // Kontextmenü für Nachrichten
+    document.addEventListener('contextmenu', (e) => {
+      const message = e.target.closest('.message');
+      if (message) {
+        e.preventDefault();
+        this.showContextMenu(e, message);
       }
     });
   },
   
+  setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      // Ctrl+K - Neuer Chat
+      if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        this.createChat();
+      }
+      
+      // Ctrl+F - Suche
+      if (e.ctrlKey && e.key === 'f') {
+        e.preventDefault();
+        document.getElementById('chatSearch').focus();
+      }
+      
+      // Ctrl+E - Export
+      if (e.ctrlKey && e.key === 'e') {
+        e.preventDefault();
+        this.exportCurrent();
+      }
+      
+      // Ctrl+Shift+L - Leeren
+      if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        this.clearCurrent();
+      }
+      
+      // Ctrl+/ - Shortcuts anzeigen
+      if (e.ctrlKey && e.key === '/') {
+        e.preventDefault();
+        this.showShortcuts();
+      }
+    });
+  },
+  
+  // Context Menu
+  showContextMenu(e, message) {
+    const menu = document.getElementById('contextMenu');
+    this.contextMenuTarget = message;
+    
+    menu.style.left = e.pageX + 'px';
+    menu.style.top = e.pageY + 'px';
+    menu.classList.add('show');
+  },
+  
+  contextMenuAction(action) {
+    if (!this.contextMenuTarget) return;
+    
+    const message = this.contextMenuTarget;
+    const messageId = message.dataset.messageId;
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    const msg = chat?.messages.find(m => m.id === messageId);
+    
+    switch (action) {
+      case 'copy':
+        const content = msg.content;
+        navigator.clipboard.writeText(content);
+        this.showToast('Nachricht kopiert', 'success');
+        break;
+      case 'edit':
+        this.editMessage(msg);
+        break;
+      case 'regenerate':
+        this.regenerateMessage(msg);
+        break;
+      case 'delete':
+        this.deleteMessage(messageId);
+        break;
+    }
+    
+    document.getElementById('contextMenu').classList.remove('show');
+  },
+  
+  editMessage(msg) {
+    const input = document.getElementById('messageInput');
+    input.value = msg.content;
+    input.focus();
+    
+    // Markiere zum Bearbeiten
+    this.editingMessageId = msg.id;
+    this.showToast('Nachricht bearbeiten...', 'info');
+  },
+  
+  regenerateMessage(msg) {
+    if (this.isGenerating) return;
+    
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    if (!chat) return;
+    
+    // Finde die vorherige User-Nachricht
+    const msgIndex = chat.messages.findIndex(m => m.id === msg.id);
+    const userMsg = chat.messages[msgIndex - 1];
+    
+    if (userMsg && userMsg.role === 'user') {
+      // Lösche die alte AI-Antwort
+      chat.messages = chat.messages.filter(m => m.id !== msg.id);
+      chat.tokenStats.output -= msg.tokens || 0;
+      
+      this.saveToStorage();
+      this.loadChat(this.currentChatId);
+      
+      // Sende erneut
+      this.sendMessageWithText(userMsg.content);
+    }
+  },
+  
+  deleteMessage(messageId) {
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    if (!chat) return;
+    
+    const msgIndex = chat.messages.findIndex(m => m.id === messageId);
+    if (msgIndex === -1) return;
+    
+    const msg = chat.messages[msgIndex];
+    
+    // Token Stats aktualisieren
+    if (msg.role === 'user') {
+      chat.tokenStats.input -= msg.tokens || 0;
+    } else {
+      chat.tokenStats.output -= msg.tokens || 0;
+    }
+    
+    chat.messages.splice(msgIndex, 1);
+    
+    this.saveToStorage();
+    this.loadChat(this.currentChatId);
+    this.updateStats();
+    this.showToast('Nachricht gelöscht', 'success');
+  },
+  
   // Token Management
   loadTokenUsage() {
-    const saved = localStorage.getItem('token-usage');
+    const saved = localStorage.getItem('token-usage-v2.7');
     if (saved) {
       this.totalTokensUsed = parseInt(saved) || 0;
     }
   },
   
   saveTokenUsage() {
-    localStorage.setItem('token-usage', this.totalTokensUsed);
+    localStorage.setItem('token-usage-v2.7', this.totalTokensUsed);
   },
   
   canUseTokens(tokens) {
@@ -1500,10 +2096,8 @@ const App = {
     const remaining = this.getRemainingTokens();
     const percentage = (used / this.TOKEN_LIMIT) * 100;
     
-    // Header Display
     document.getElementById('tokenUsedDisplay').textContent = this.formatNumber(used);
     
-    // Progress Bar
     const progressFill = document.getElementById('tokenProgressFill');
     progressFill.style.width = `${Math.min(percentage, 100)}%`;
     progressFill.classList.remove('warning', 'error');
@@ -1514,7 +2108,6 @@ const App = {
       progressFill.classList.add('warning');
     }
     
-    // Panel Display
     document.getElementById('panelTokensUsed').textContent = this.formatNumber(used);
     document.getElementById('panelTokensRemaining').textContent = this.formatNumber(remaining);
     
@@ -1530,18 +2123,947 @@ const App = {
   
   toggleTokenPanel() {
     this.tokenPanelVisible = !this.tokenPanelVisible;
-    document.getElementById('tokenPanel').style.display = this.tokenPanelVisible ? 'block' : 'none';
+    const panel = document.getElementById('tokenPanel');
+    if (panel) {
+      panel.style.display = this.tokenPanelVisible ? 'block' : 'none';
+    }
     if (this.tokenPanelVisible) {
       this.updateTokenDisplay();
     }
+  },
+  
+  // Chat Management
+  generateId() {
+    return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  },
+  
+  createChat() {
+    const chat = {
+      id: this.generateId(),
+      title: 'Neuer Chat',
+      messages: [],
+      tokenStats: { input: 0, output: 0 },
+      cost: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      modelId: this.selectedModel,
+      pinned: false
+    };
+    
+    this.chats.unshift(chat);
+    this.currentChatId = chat.id;
+    this.filteredChats = this.chats;
+    this.saveToStorage();
+    this.renderChatList();
+    this.loadChat(chat.id);
+    this.updateStats();
+    
+    if (window.innerWidth <= 768) this.closeSidebar();
+    
+    this.showToast('Neuer Chat erstellt', 'success');
+  },
+  
+  deleteChat(chatId) {
+    this.chats = this.chats.filter(c => c.id !== chatId);
+    this.filteredChats = this.chats;
+    
+    if (this.currentChatId === chatId) {
+      this.currentChatId = this.chats[0]?.id || null;
+      this.loadChat(this.currentChatId);
+    }
+    
+    this.saveToStorage();
+    this.renderChatList();
+    this.updateStats();
+    this.showToast('Chat gelöscht', 'success');
+  },
+  
+  pinChat(chatId) {
+    const chat = this.chats.find(c => c.id === chatId);
+    if (chat) {
+      chat.pinned = !chat.pinned;
+      this.saveToStorage();
+      this.renderChatList();
+    }
+  },
+  
+  searchChats(query) {
+    if (!query) {
+      this.filteredChats = this.chats;
+    } else {
+      const lowerQuery = query.toLowerCase();
+      this.filteredChats = this.chats.filter(chat => 
+        chat.title.toLowerCase().includes(lowerQuery) ||
+        chat.messages.some(m => m.content.toLowerCase().includes(lowerQuery))
+      );
+    }
+    this.renderChatList();
+  },
+  
+  sortChats(type) {
+    this.sortOrder = type;
+    
+    if (type === 'date') {
+      this.chats.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    } else {
+      this.chats.sort((a, b) => a.title.localeCompare(b.title));
+    }
+    
+    // Pinned Chats immer oben
+    this.chats.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+    
+    this.filteredChats = this.chats;
+    this.renderChatList();
+  },
+  
+  loadChat(chatId) {
+    const chat = this.chats.find(c => c.id === chatId);
+    if (!chat) {
+      this.showWelcomeScreen();
+      return;
+    }
+    
+    this.currentChatId = chatId;
+    this.selectedModel = chat.modelId;
+    this.updateModelDisplay();
+    
+    const container = document.getElementById('chatContainer');
+    container.innerHTML = '';
+    
+    if (this.tokenPanelVisible) {
+      const panel = document.createElement('div');
+      panel.className = 'token-panel';
+      panel.id = 'tokenPanel';
+      panel.style.display = 'block';
+      panel.innerHTML = `
+        <div class="token-panel-header">
+          <h3><span>🪙</span> Token Freemium</h3>
+          <button class="close-panel" onclick="app.toggleTokenPanel()">✕</button>
+        </div>
+        <div class="token-stats">
+          <div class="token-stat">
+            <div class="token-stat-label">Verbraucht</div>
+            <div class="token-stat-value" id="panelTokensUsed">${this.formatNumber(this.totalTokensUsed)}</div>
+          </div>
+          <div class="token-stat">
+            <div class="token-stat-label">Verfügbar</div>
+            <div class="token-stat-value" id="panelTokensRemaining">${this.formatNumber(this.getRemainingTokens())}</div>
+          </div>
+        </div>
+        <div class="token-limit-info">
+          <span id="tokenLimitMessage">${this.getRemainingTokens() <= 0 ? '⚠️ Token-Limit erreicht!' : `🪙 Freemium: ${this.formatNumber(this.getRemainingTokens())} Tokens verfügbar`}</span>
+        </div>
+        <button class="upgrade-btn" onclick="app.showUpgradeMessage()">
+          <span>⭐</span> Upgrade auf Premium
+        </button>
+      `;
+      container.appendChild(panel);
+    }
+    
+    chat.messages.forEach(msg => this.renderMessage(msg));
+    
+    this.renderChatList();
+    this.scrollToBottom();
+    
+    if (window.innerWidth <= 768) this.closeSidebar();
+  },
+  
+  clearCurrent() {
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    if (chat) {
+      chat.messages = [];
+      chat.tokenStats = { input: 0, output: 0 };
+      chat.cost = 0;
+      this.saveToStorage();
+      this.loadChat(this.currentChatId);
+      this.updateStats();
+      this.showToast('Chat geleert', 'success');
+    }
+  },
+  
+  // Messages
+  async sendMessage() {
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    
+    if (!text || this.isGenerating || !this.currentChatId) return;
+    
+    await this.sendMessageWithText(text);
+  },
+  
+  async sendMessageWithText(text) {
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    if (!chat) return;
+    
+    const inputTokens = this.estimateTokens(text);
+    const estimatedTotal = inputTokens + 200;
+    
+    if (!this.canUseTokens(estimatedTotal)) {
+      const remaining = this.getRemainingTokens();
+      this.showToast(`Nicht genug Tokens! Noch ${this.formatNumber(remaining)} verfügbar.`, 'warning');
+      this.toggleTokenPanel();
+      return;
+    }
+    
+    this.isGenerating = true;
+    const sendBtn = document.getElementById('sendBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const msgInput = document.getElementById('messageInput');
+    
+    sendBtn.style.display = 'none';
+    stopBtn.classList.add('visible');
+    msgInput.disabled = true;
+    
+    const input = document.getElementById('messageInput');
+    input.value = '';
+    this.updateCharCount();
+    
+    const messageId = this.generateId();
+    const userMsg = {
+      id: messageId,
+      role: 'user',
+      content: text,
+      tokens: inputTokens,
+      timestamp: new Date().toISOString(),
+      status: 'sent'
+    };
+    
+    chat.messages.push(userMsg);
+    chat.tokenStats.input += inputTokens;
+    chat.updatedAt = new Date().toISOString();
+    this.addTokenUsage(inputTokens);
+    this.updateChatCost(chat);
+    this.renderMessage(userMsg);
+    
+    if (chat.messages.length === 1) {
+      chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
+    }
+    
+    this.saveToStorage();
+    this.renderChatList();
+    this.updateStats();
+    
+    const loadingId = this.showLoadingMessage();
+    
+    try {
+      this.abortController = new AbortController();
+      
+      const response = await this.callAPI(text, chat.messages, this.abortController.signal);
+      this.removeLoadingMessage(loadingId);
+      
+      const outputTokens = this.estimateTokens(response);
+      
+      if (!this.canUseTokens(outputTokens)) {
+        this.showToast('Token-Limit während der Generierung erreicht!', 'warning');
+      }
+      
+      this.addTokenUsage(outputTokens);
+      
+      const aiMsg = {
+        id: this.generateId(),
+        role: 'assistant',
+        content: response,
+        tokens: outputTokens,
+        timestamp: new Date().toISOString()
+      };
+      
+      chat.messages.push(aiMsg);
+      chat.tokenStats.output += outputTokens;
+      chat.updatedAt = new Date().toISOString();
+      this.updateChatCost(chat);
+      this.renderMessage(aiMsg);
+      
+      this.saveToStorage();
+      this.updateStats();
+      
+    } catch (error) {
+      this.removeLoadingMessage(loadingId);
+      
+      if (error.name === 'AbortError') {
+        this.showToast('Generierung abgebrochen', 'info');
+      } else {
+        this.renderMessage({
+          id: this.generateId(),
+          role: 'assistant',
+          content: `Fehler: ${error.message}`,
+          tokens: 0,
+          timestamp: new Date().toISOString()
+        });
+        this.showToast('Fehler beim Senden', 'error');
+      }
+    } finally {
+      this.isGenerating = false;
+      this.abortController = null;
+      sendBtn.style.display = 'flex';
+      stopBtn.classList.remove('visible');
+      msgInput.disabled = false;
+      input.focus();
+    }
+  },
+  
+  stopGeneration() {
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+  },
+  
+  async callAPI(message, history, signal) {
+    const res = await fetch("http://localhost:3000/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        model: this.selectedModel,
+        history: history.slice(-10).map(m => ({ role: m.role, content: m.content }))
+      }),
+      signal
+    });
+    
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    
+    const data = await res.json();
+    return data.choices[0].message.content;
+  },
+  
+  renderMessage(msg) {
+    const container = document.getElementById('chatContainer');
+    const welcome = container.querySelector('.welcome-screen');
+    if (welcome) welcome.remove();
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${msg.role === 'user' ? 'user' : ''}`;
+    messageDiv.dataset.messageId = msg.id;
+    
+    const content = msg.role === 'assistant' ? this.formatContent(msg.content) : this.escapeHtml(msg.content);
+    
+    messageDiv.innerHTML = `
+      <div class="message-avatar" onclick="app.showMessageInfo('${msg.id}')">${msg.role === 'user' ? '👤' : '🤖'}</div>
+      <div class="message-content">
+        <div class="message-header">
+          <div class="message-actions">
+            <button class="message-action-btn" onclick="app.copyMessageContent(this, '${this.escapeHtml(msg.content).replace(/'/g, "\\'")}')">
+              📋 Kopieren
+            </button>
+            ${msg.role === 'assistant' ? `
+              <button class="message-action-btn" onclick="app.regenerateMessageById('${msg.id}')">
+                🔄 Neu
+              </button>
+            ` : `
+              <button class="message-action-btn" onclick="app.editMessageById('${msg.id}')">
+                ✏️ Bearbeiten
+              </button>
+            `}
+          </div>
+        </div>
+        <div class="message-bubble">${content}</div>
+        <div class="message-footer">
+          <span>${new Date(msg.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</span>
+          ${msg.tokens ? `<span>${msg.tokens} Tokens</span>` : ''}
+          ${msg.status ? `<span class="message-status ${msg.status}">${msg.status === 'sent' ? '✓' : '✓✓'}</span>` : ''}
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(messageDiv);
+    
+    if (msg.role === 'assistant') {
+      messageDiv.querySelectorAll('pre code').forEach(block => {
+        hljs.highlightElement(block);
+      });
+    }
+    
+    if (this.autoScroll) this.scrollToBottom();
+  },
+  
+  formatContent(text) {
+    let formatted = text;
+    
+    // Code Blocks
+    formatted = formatted.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+      const language = lang || this.detectLanguage(code);
+      const escaped = this.escapeHtml(code.trim());
+      
+      return `
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">${language}</span>
+            <button class="copy-btn" onclick="app.copyCode(this, '${escaped.replace(/'/g, "\\'").replace(/\n/g, '\\n')}')">📋 Kopieren</button>
+          </div>
+          <div class="code-content">
+            <pre><code class="language-${language}">${escaped}</code></pre>
+          </div>
+        </div>
+      `;
+    });
+    
+    // Tables
+    formatted = formatted.replace(/\|(.+)\|/g, (match) => {
+      const rows = match.split('\n').filter(r => r.includes('|'));
+      if (rows.length < 2) return match;
+      
+      let html = '<table class="markdown-table">';
+      rows.forEach((row, i) => {
+        const cells = row.split('|').filter(c => c.trim());
+        html += '<tr>';
+        cells.forEach(cell => {
+          html += i === 1 && cell.includes('---') ? '<th>' : '<td>';
+          html += cell.replace(/-+/g, '').trim();
+          html += i === 1 && cell.includes('---') ? '</th>' : '</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</table>';
+      return html;
+    });
+    
+    // Blockquotes
+    formatted = formatted.replace(/^&gt; (.*)$/gm, '<div class="markdown-blockquote">$1</div>');
+    
+    // Inline Code
+    formatted = formatted.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+    
+    // Bold und Italic
+    formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    
+    // Line Breaks
+    formatted = formatted.replace(/\n/g, '<br>');
+    
+    return formatted;
+  },
+  
+  detectLanguage(code) {
+    const patterns = {
+      'python': /^(import |from |def |class )/m,
+      'javascript': /^(const |let |var |function |=>)/m,
+      'typescript': /^(interface |type |enum )/m,
+      'bash': /^(#!\/bin\/bash|\$ |sudo )/m,
+      'html': /^(<!DOCTYPE|<html)/m,
+      'css': /^([.#][\w-]+\s*{)/m,
+      'sql': /^(SELECT |INSERT |UPDATE |DELETE )/mi,
+      'java': /^(public class |import java)/m,
+      'cpp': /^(#include |int main)/m,
+      'go': /^(package |func |import )/m,
+      'rust': /^(fn |let mut |impl )/m,
+      'json': /^[{\[]/,
+      'yaml': /^[\w-]+:\s/m
+    };
+    
+    for (const [lang, pattern] of Object.entries(patterns)) {
+      if (pattern.test(code)) return lang;
+    }
+    return 'plaintext';
+  },
+  
+  // Formatting Toolbar
+  insertFormatting(before, after) {
+    const input = document.getElementById('messageInput');
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const text = input.value;
+    const selectedText = text.substring(start, end);
+    
+    const newText = text.substring(0, start) + before + selectedText + after + text.substring(end);
+    input.value = newText;
+    
+    input.focus();
+    input.setSelectionRange(start + before.length, end + before.length);
+    
+    this.updateCharCount();
+  },
+  
+  // Export/Import
+  exportCurrent() {
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    if (!chat) {
+      this.showToast('Kein Chat zum Exportieren', 'error');
+      return;
+    }
+    
+    const data = { 
+      version: '2.7', 
+      type: 'ai-chat-v2', 
+      chat,
+      exportDate: new Date().toISOString()
+    };
+    
+    this.downloadJSON(data, `chat-${chat.title.substring(0, 20)}-${new Date().toISOString().split('T')[0]}.json`);
+    this.showToast('Chat exportiert', 'success');
+  },
+  
+  exportAll() {
+    if (this.chats.length === 0) {
+      this.showToast('Keine Chats zum Exportieren', 'error');
+      return;
+    }
+    
+    const data = {
+      version: '2.7',
+      type: 'ai-chat-v2-all',
+      chats: this.chats,
+      exportDate: new Date().toISOString(),
+      tokenUsage: this.totalTokensUsed
+    };
+    
+    this.downloadJSON(data, `all-chats-${new Date().toISOString().split('T')[0]}.json`);
+    this.showToast(`${this.chats.length} Chats exportiert`, 'success');
+  },
+  
+  shareChat() {
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    if (!chat) {
+      this.showToast('Kein Chat zum Teilen', 'error');
+      return;
+    }
+    
+    const shareData = {
+      title: chat.title,
+      text: `Chat: ${chat.title}\nNachrichten: ${chat.messages.length}`,
+    };
+    
+    if (navigator.share) {
+      navigator.share(shareData).catch(() => {});
+    } else {
+      this.showToast('Teilen wird von diesem Browser nicht unterstützt', 'warning');
+    }
+  },
+  
+  openImportModal() {
+    document.getElementById('importModal').style.display = 'flex';
+  },
+  
+  closeImportModal() {
+    document.getElementById('importModal').style.display = 'none';
+    document.getElementById('importTextarea').value = '';
+    document.getElementById('fileInput').value = '';
+  },
+  
+  importChats() {
+    const textarea = document.getElementById('importTextarea');
+    const content = textarea.value.trim();
+    
+    if (!content) {
+      this.showToast('Bitte JSON-Daten einfügen oder Datei auswählen', 'error');
+      return;
+    }
+    
+    try {
+      const data = JSON.parse(content);
+      
+      if (data.type === 'ai-chat-v2' && data.chat) {
+        this.importChat(data.chat);
+      } else if (data.type === 'ai-chat-v2-all' && data.chats) {
+        data.chats.forEach(chat => this.importChat(chat));
+        if (data.tokenUsage) {
+          this.totalTokensUsed = data.tokenUsage;
+          this.saveTokenUsage();
+          this.updateTokenDisplay();
+        }
+      } else if (data.messages) {
+        this.importChat(data);
+      } else {
+        throw new Error('Ungültiges Format');
+      }
+      
+      this.closeImportModal();
+      this.filteredChats = this.chats;
+      this.saveToStorage();
+      this.renderChatList();
+      this.updateStats();
+      
+      if (this.chats.length > 0 && !this.currentChatId) {
+        this.loadChat(this.chats[0].id);
+      }
+      
+      this.showToast('Import erfolgreich', 'success');
+      
+    } catch (e) {
+      this.showToast('Import fehlgeschlagen: ' + e.message, 'error');
+    }
+  },
+  
+  importChat(chatData) {
+    const newChat = {
+      id: this.generateId(),
+      title: chatData.title || 'Importierter Chat',
+      messages: (chatData.messages || []).map(m => ({ ...m, id: m.id || this.generateId() })),
+      tokenStats: chatData.tokenStats || { input: 0, output: 0 },
+      cost: chatData.cost || 0,
+      createdAt: chatData.createdAt || new Date().toISOString(),
+      updatedAt: chatData.updatedAt || new Date().toISOString(),
+      modelId: chatData.modelId || this.selectedModel,
+      pinned: chatData.pinned || false
+    };
+    
+    this.chats.unshift(newChat);
+  },
+  
+  // Model Management
+  async loadModels() {
+    try {
+      const res = await fetch("http://localhost:3000/models");
+      const data = await res.json();
+      
+      if (data.data?.length > 0) {
+        this.models = data.data;
+        this.renderModelOptions();
+      }
+    } catch (e) {
+      console.error('Fehler beim Laden der Modelle:', e);
+    }
+  },
+  
+  renderModelOptions() {
+    const container = document.getElementById('modelOptions');
+    container.innerHTML = this.models.map(model => {
+      const pricing = this.modelPricing[model.id] || this.modelPricing.default;
+      return `
+        <div class="model-option ${model.id === this.selectedModel ? 'selected' : ''}" onclick="app.selectModel('${model.id}')">
+          <span>${this.formatModelName(model.id)}</span>
+          <span class="model-badge">$${pricing.input}/1M</span>
+        </div>
+      `;
+    }).join('');
+  },
+  
+  selectModel(modelId) {
+    this.selectedModel = modelId;
+    
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    if (chat) {
+      chat.modelId = modelId;
+      this.saveToStorage();
+    }
+    
+    this.updateModelDisplay();
+    this.renderModelOptions();
+    this.closeModelDropdown();
+    this.showToast(`Modell: ${this.formatModelName(modelId)}`, 'info');
+  },
+  
+  // UI Helpers
+  updateUI() {
+    this.filteredChats = this.chats;
+    this.renderChatList();
+    this.updateStats();
+    this.updateModelDisplay();
+    
+    if (this.currentChatId) {
+      this.loadChat(this.currentChatId);
+    }
+  },
+  
+  renderChatList() {
+    const list = document.getElementById('chatList');
+    const chatsToRender = this.filteredChats.length ? this.filteredChats : this.chats;
+    
+    list.innerHTML = chatsToRender.map(chat => `
+      <div class="chat-item ${chat.id === this.currentChatId ? 'active' : ''} ${chat.pinned ? 'pinned' : ''}" onclick="app.loadChat('${chat.id}')">
+        <span class="chat-icon">${chat.pinned ? '📌' : '💬'}</span>
+        <div class="chat-info">
+          <div class="chat-title">
+            <span class="editable-title" onclick="event.stopPropagation(); app.openRenameModal('${chat.id}')" title="Klicken zum Umbenennen">${chat.title}</span>
+          </div>
+          <div class="chat-meta">
+            <span>${chat.messages.length} Nachrichten</span>
+            <span>${this.formatDate(chat.updatedAt)}</span>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <button class="action-btn" onclick="event.stopPropagation(); app.pinChat('${chat.id}')" title="${chat.pinned ? 'Lösen' : 'Anheften'}">📌</button>
+          <button class="action-btn" onclick="event.stopPropagation(); app.openRenameModal('${chat.id}')" title="Umbenennen">✏️</button>
+          <button class="action-btn" onclick="event.stopPropagation(); app.exportChat('${chat.id}')" title="Exportieren">📤</button>
+          <button class="action-btn" onclick="event.stopPropagation(); app.deleteChat('${chat.id}')" title="Löschen">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  },
+  
+  updateStats() {
+    const totalChats = this.chats.length;
+    const totalMessages = this.chats.reduce((sum, c) => sum + c.messages.length, 0);
+    const totalTokens = this.chats.reduce((sum, c) => sum + (c.tokenStats?.input || 0) + (c.tokenStats?.output || 0), 0);
+    const totalCost = this.chats.reduce((sum, c) => sum + (c.cost || 0), 0);
+    
+    document.getElementById('statChats').textContent = totalChats;
+    document.getElementById('statMessages').textContent = totalMessages;
+    document.getElementById('statTokens').textContent = this.formatNumber(totalTokens);
+    document.getElementById('statCost').textContent = '$' + totalCost.toFixed(4);
+  },
+  
+  updateChatCost(chat) {
+    const pricing = this.modelPricing[chat.modelId] || this.modelPricing.default;
+    chat.cost = ((chat.tokenStats.input || 0) / 1000000) * pricing.input + 
+                ((chat.tokenStats.output || 0) / 1000000) * pricing.output;
+  },
+  
+  updateModelDisplay() {
+    document.getElementById('selectedModelDisplay').textContent = this.formatModelName(this.selectedModel);
+  },
+  
+  updateToggleStates() {
+    const themeToggle = document.getElementById('themeToggle');
+    const isLight = document.body.dataset.theme === 'light';
+    themeToggle.classList.toggle('active', isLight);
+    
+    const autoScrollToggle = document.getElementById('autoScrollToggle');
+    autoScrollToggle.classList.toggle('active', this.autoScroll);
+    
+    const streamToggle = document.getElementById('streamToggle');
+    streamToggle.classList.toggle('active', this.streamResponse);
+  },
+  
+  // Modal Functions
+  openRenameModal(chatId) {
+    const chat = this.chats.find(c => c.id === chatId);
+    if (!chat) return;
+    
+    this.renameChatId = chatId;
+    document.getElementById('renameInput').value = chat.title;
+    document.getElementById('renameModal').style.display = 'flex';
+    setTimeout(() => document.getElementById('renameInput').focus(), 100);
+  },
+  
+  closeRenameModal() {
+    document.getElementById('renameModal').style.display = 'none';
+    this.renameChatId = null;
+  },
+  
+  saveRename() {
+    const newTitle = document.getElementById('renameInput').value.trim();
+    if (!newTitle || !this.renameChatId) return;
+    
+    const chat = this.chats.find(c => c.id === this.renameChatId);
+    if (chat) {
+      chat.title = newTitle;
+      chat.updatedAt = new Date().toISOString();
+      this.saveToStorage();
+      this.renderChatList();
+    }
+    
+    this.closeRenameModal();
+    this.showToast('Chat umbenannt', 'success');
+  },
+  
+  showShortcuts() {
+    document.getElementById('shortcutsModal').style.display = 'flex';
+  },
+  
+  closeShortcutsModal() {
+    document.getElementById('shortcutsModal').style.display = 'none';
   },
   
   showUpgradeMessage() {
     this.showToast('✨ Premium Features bald verfügbar!', 'success');
   },
   
+  showMessageInfo(messageId) {
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    const msg = chat?.messages.find(m => m.id === messageId);
+    if (msg) {
+      this.showToast(`Tokens: ${msg.tokens || 0} | ${new Date(msg.timestamp).toLocaleString('de-DE')}`, 'info');
+    }
+  },
+  
+  editMessageById(messageId) {
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    const msg = chat?.messages.find(m => m.id === messageId);
+    if (msg) {
+      this.editMessage(msg);
+    }
+  },
+  
+  regenerateMessageById(messageId) {
+    const chat = this.chats.find(c => c.id === this.currentChatId);
+    const msg = chat?.messages.find(m => m.id === messageId);
+    if (msg) {
+      this.regenerateMessage(msg);
+    }
+  },
+  
+  // Utilities
+  generateId() {
+    return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  },
+  
+  estimateTokens(text) {
+    return Math.ceil(text.length / 3.8);
+  },
+  
+  formatNumber(num) {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+  },
+  
+  formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) return 'Gerade eben';
+    if (diff < 3600000) return 'vor ' + Math.floor(diff / 60000) + 'm';
+    if (diff < 86400000) return 'vor ' + Math.floor(diff / 3600000) + 'h';
+    if (diff < 604800000) return 'vor ' + Math.floor(diff / 86400000) + 'd';
+    return date.toLocaleDateString('de-DE');
+  },
+  
+  formatModelName(id) {
+    return id.split('/').pop();
+  },
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  },
+  
+  copyCode(btn, code) {
+    const unescaped = code.replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/\\\\/g, '\\').replace(/\\n/g, '\n');
+    navigator.clipboard.writeText(unescaped).then(() => {
+      btn.classList.add('copied');
+      btn.textContent = '✓ Kopiert!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = '📋 Kopieren';
+      }, 2000);
+    });
+    this.showToast('Code kopiert', 'success');
+  },
+  
+  copyMessageContent(btn, content) {
+    const unescaped = content.replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/\\\\/g, '\\').replace(/<br>/g, '\n');
+    const div = document.createElement('div');
+    div.innerHTML = unescaped;
+    const text = div.textContent;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = '✓ Kopiert!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '📋 Kopieren';
+      }, 2000);
+    });
+    this.showToast('Nachricht kopiert', 'success');
+  },
+  
+  downloadJSON(data, filename) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+  
+  // Storage
+  saveToStorage() {
+    localStorage.setItem('ai-chat-v2.7', JSON.stringify({
+      chats: this.chats,
+      settings: { 
+        theme: document.body.dataset.theme || 'dark', 
+        autoScroll: this.autoScroll,
+        streamResponse: this.streamResponse
+      }
+    }));
+  },
+  
+  loadFromStorage() {
+    const saved = localStorage.getItem('ai-chat-v2.7');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        this.chats = data.chats || [];
+        this.autoScroll = data.settings?.autoScroll ?? true;
+        this.streamResponse = data.settings?.streamResponse ?? true;
+        
+        if (data.settings?.theme === 'light') {
+          document.body.dataset.theme = 'light';
+        }
+        
+        if (this.chats.length > 0) {
+          this.currentChatId = this.chats[0].id;
+        }
+      } catch (e) {
+        console.error('Fehler beim Laden:', e);
+      }
+    }
+    this.filteredChats = this.chats;
+  },
+  
+  // Event Handlers
+  toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    this.sidebarOpen = !this.sidebarOpen;
+    sidebar.classList.toggle('open', this.sidebarOpen);
+    overlay.classList.toggle('show', this.sidebarOpen);
+  },
+  
+  closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    this.sidebarOpen = false;
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  },
+  
+  toggleTheme() {
+    const themeToggle = document.getElementById('themeToggle');
+    const isLight = document.body.dataset.theme === 'light';
+    
+    document.body.dataset.theme = isLight ? '' : 'light';
+    themeToggle.classList.toggle('active', !isLight);
+    
+    this.saveToStorage();
+    this.showToast(isLight ? 'Dark Mode aktiviert' : 'Light Mode aktiviert', 'info');
+  },
+  
+  toggleAutoScroll() {
+    this.autoScroll = !this.autoScroll;
+    document.getElementById('autoScrollToggle').classList.toggle('active', this.autoScroll);
+    this.saveToStorage();
+  },
+  
+  toggleStream() {
+    this.streamResponse = !this.streamResponse;
+    document.getElementById('streamToggle').classList.toggle('active', this.streamResponse);
+    this.saveToStorage();
+  },
+  
+  toggleModelDropdown() {
+    this.modelDropdownOpen = !this.modelDropdownOpen;
+    document.getElementById('modelDropdown').classList.toggle('show', this.modelDropdownOpen);
+  },
+  
+  closeModelDropdown() {
+    this.modelDropdownOpen = false;
+    document.getElementById('modelDropdown').classList.remove('show');
+  },
+  
+  filterModels() {
+    const search = document.getElementById('modelSearch').value.toLowerCase();
+    const filtered = this.models.filter(m => 
+      this.formatModelName(m.id).toLowerCase().includes(search)
+    );
+    
+    const container = document.getElementById('modelOptions');
+    container.innerHTML = filtered.map(model => {
+      const pricing = this.modelPricing[model.id] || this.modelPricing.default;
+      return `
+        <div class="model-option ${model.id === this.selectedModel ? 'selected' : ''}" onclick="app.selectModel('${model.id}')">
+          <span>${this.formatModelName(model.id)}</span>
+          <span class="model-badge">$${pricing.input}/1M</span>
+        </div>
+      `;
+    }).join('');
+  },
+  
   setupFileDrop() {
     const dropArea = document.getElementById('fileDropArea');
+    if (!dropArea) return;
     
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
       dropArea.addEventListener(eventName, (e) => {
@@ -1585,658 +3107,6 @@ const App = {
     }
   },
   
-  updateToggleStates() {
-    const themeToggle = document.getElementById('themeToggle');
-    const isLight = document.body.dataset.theme === 'light';
-    themeToggle.classList.toggle('active', isLight);
-    
-    const autoScrollToggle = document.getElementById('autoScrollToggle');
-    autoScrollToggle.classList.toggle('active', this.autoScroll);
-  },
-  
-  toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    this.sidebarOpen = !this.sidebarOpen;
-    sidebar.classList.toggle('open', this.sidebarOpen);
-    overlay.classList.toggle('show', this.sidebarOpen);
-  },
-  
-  closeSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    this.sidebarOpen = false;
-    sidebar.classList.remove('open');
-    overlay.classList.remove('show');
-  },
-  
-  createChat() {
-    const chat = {
-      id: this.generateId(),
-      title: 'Neuer Chat',
-      messages: [],
-      tokenStats: { input: 0, output: 0 },
-      cost: 0,
-      createdAt: new Date().toISOString(),
-      modelId: this.selectedModel
-    };
-    
-    this.chats.unshift(chat);
-    this.currentChatId = chat.id;
-    this.saveToStorage();
-    this.renderChatList();
-    this.loadChat(chat.id);
-    this.updateStats();
-    
-    if (window.innerWidth <= 768) this.closeSidebar();
-  },
-  
-  deleteChat(chatId) {
-    this.chats = this.chats.filter(c => c.id !== chatId);
-    
-    if (this.currentChatId === chatId) {
-      this.currentChatId = this.chats[0]?.id || null;
-      this.loadChat(this.currentChatId);
-    }
-    
-    this.saveToStorage();
-    this.renderChatList();
-    this.updateStats();
-  },
-  
-  openRenameModal(chatId) {
-    const chat = this.chats.find(c => c.id === chatId);
-    if (!chat) return;
-    
-    this.renameChatId = chatId;
-    document.getElementById('renameInput').value = chat.title;
-    document.getElementById('renameModal').style.display = 'flex';
-    setTimeout(() => document.getElementById('renameInput').focus(), 100);
-  },
-  
-  closeRenameModal() {
-    document.getElementById('renameModal').style.display = 'none';
-    this.renameChatId = null;
-  },
-  
-  saveRename() {
-    const newTitle = document.getElementById('renameInput').value.trim();
-    if (!newTitle || !this.renameChatId) return;
-    
-    const chat = this.chats.find(c => c.id === this.renameChatId);
-    if (chat) {
-      chat.title = newTitle;
-      this.saveToStorage();
-      this.renderChatList();
-    }
-    
-    this.closeRenameModal();
-    this.showToast('Chat umbenannt');
-  },
-  
-  loadChat(chatId) {
-    const chat = this.chats.find(c => c.id === chatId);
-    if (!chat) {
-      this.showWelcomeScreen();
-      return;
-    }
-    
-    this.currentChatId = chatId;
-    this.selectedModel = chat.modelId;
-    this.updateModelDisplay();
-    
-    const container = document.getElementById('chatContainer');
-    container.innerHTML = '';
-    
-    // Token Panel wieder hinzufügen wenn es sichtbar war
-    if (this.tokenPanelVisible) {
-      const panel = document.createElement('div');
-      panel.className = 'token-panel';
-      panel.id = 'tokenPanel';
-      panel.style.display = 'block';
-      panel.innerHTML = document.getElementById('tokenPanel').innerHTML;
-      container.appendChild(panel);
-    }
-    
-    chat.messages.forEach(msg => this.renderMessage(msg));
-    
-    this.renderChatList();
-    this.scrollToBottom();
-    
-    if (window.innerWidth <= 768) this.closeSidebar();
-  },
-  
-  clearCurrent() {
-    const chat = this.chats.find(c => c.id === this.currentChatId);
-    if (chat) {
-      chat.messages = [];
-      chat.tokenStats = { input: 0, output: 0 };
-      chat.cost = 0;
-      this.saveToStorage();
-      this.loadChat(this.currentChatId);
-      this.updateStats();
-      this.showToast('Chat geleert');
-    }
-  },
-  
-  async sendMessage() {
-    const input = document.getElementById('messageInput');
-    const text = input.value.trim();
-    
-    if (!text || this.isGenerating || !this.currentChatId) return;
-    
-    const chat = this.chats.find(c => c.id === this.currentChatId);
-    if (!chat) return;
-    
-    const inputTokens = this.estimateTokens(text);
-    const estimatedTotal = inputTokens + 200; // Geschätzte Antwort-Tokens
-    
-    // Token Limit prüfen
-    if (!this.canUseTokens(estimatedTotal)) {
-      const remaining = this.getRemainingTokens();
-      this.showToast(`Nicht genug Tokens! Noch ${this.formatNumber(remaining)} verfügbar.`, 'warning');
-      this.toggleTokenPanel();
-      return;
-    }
-    
-    this.isGenerating = true;
-    const sendBtn = document.getElementById('sendBtn');
-    const msgInput = document.getElementById('messageInput');
-    sendBtn.disabled = true;
-    msgInput.disabled = true;
-    sendBtn.classList.add('loading');
-    input.value = '';
-    this.updateCharCount();
-    
-    const userMsg = {
-      role: 'user',
-      content: text,
-      tokens: inputTokens,
-      timestamp: new Date().toISOString()
-    };
-    
-    chat.messages.push(userMsg);
-    chat.tokenStats.input += inputTokens;
-    this.addTokenUsage(inputTokens);
-    this.updateChatCost(chat);
-    this.renderMessage(userMsg);
-    
-    if (chat.messages.length === 1) {
-      chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
-    }
-    
-    this.saveToStorage();
-    this.renderChatList();
-    this.updateStats();
-    
-    const loadingId = this.showLoadingMessage();
-    
-    try {
-      const response = await this.callAPI(text, chat.messages);
-      this.removeLoadingMessage(loadingId);
-      
-      const outputTokens = this.estimateTokens(response);
-      
-      // Token Limit für Antwort prüfen
-      if (!this.canUseTokens(outputTokens)) {
-        this.showToast('Token-Limit während der Generierung erreicht!', 'warning');
-      }
-      
-      this.addTokenUsage(outputTokens);
-      
-      const aiMsg = {
-        role: 'assistant',
-        content: response,
-        tokens: outputTokens,
-        timestamp: new Date().toISOString()
-      };
-      
-      chat.messages.push(aiMsg);
-      chat.tokenStats.output += outputTokens;
-      this.updateChatCost(chat);
-      this.renderMessage(aiMsg);
-      
-      this.saveToStorage();
-      this.updateStats();
-      
-    } catch (error) {
-      this.removeLoadingMessage(loadingId);
-      this.renderMessage({
-        role: 'assistant',
-        content: `Fehler: ${error.message}`,
-        tokens: 0,
-        timestamp: new Date().toISOString()
-      });
-      this.showToast('Fehler beim Senden', 'error');
-    } finally {
-      this.isGenerating = false;
-      sendBtn.disabled = false;
-      msgInput.disabled = false;
-      sendBtn.classList.remove('loading');
-      input.focus();
-    }
-  },
-  
-  async callAPI(message, history) {
-    const res = await fetch("http://localhost:3000/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message,
-        model: this.selectedModel,
-        history: history.slice(-10).map(m => ({ role: m.role, content: m.content }))
-      })
-    });
-    
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    
-    const data = await res.json();
-    return data.choices[0].message.content;
-  },
-  
-  renderMessage(msg) {
-    const container = document.getElementById('chatContainer');
-    const welcome = container.querySelector('.welcome-screen');
-    if (welcome) welcome.remove();
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${msg.role === 'user' ? 'user' : ''}`;
-    
-    const content = msg.role === 'assistant' ? this.formatContent(msg.content) : this.escapeHtml(msg.content);
-    
-    messageDiv.innerHTML = `
-      <div class="message-avatar">${msg.role === 'user' ? '👤' : '🤖'}</div>
-      <div class="message-content">
-        <div class="message-header">
-          <button class="message-copy-btn" onclick="app.copyMessageContent(this, '${this.escapeHtml(msg.content).replace(/'/g, "\\'")}')">
-            📋 Kopieren
-          </button>
-        </div>
-        <div class="message-bubble">${content}</div>
-        <div class="message-footer">
-          <span>${new Date(msg.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</span>
-          ${msg.tokens ? `<span>${msg.tokens} Tokens</span>` : ''}
-        </div>
-      </div>
-    `;
-    
-    container.appendChild(messageDiv);
-    
-    if (msg.role === 'assistant') {
-      messageDiv.querySelectorAll('pre code').forEach(block => {
-        hljs.highlightElement(block);
-      });
-    }
-    
-    if (this.autoScroll) this.scrollToBottom();
-  },
-  
-  formatContent(text) {
-    let formatted = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
-      const language = lang || this.detectLanguage(code);
-      const escaped = this.escapeHtml(code.trim());
-      
-      return `
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-lang">${language}</span>
-            <button class="copy-btn" onclick="app.copyCode(this, '${escaped.replace(/'/g, "\\'").replace(/\n/g, '\\n')}')">📋 Kopieren</button>
-          </div>
-          <div class="code-content">
-            <pre><code class="language-${language}">${escaped}</code></pre>
-          </div>
-        </div>
-      `;
-    });
-    
-    formatted = formatted.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-    formatted = formatted.replace(/\n/g, '<br>');
-    
-    return formatted;
-  },
-  
-  detectLanguage(code) {
-    const patterns = {
-      'python': /^(import |from |def |class )/m,
-      'javascript': /^(const |let |var |function |=>)/m,
-      'bash': /^(#!\/bin\/bash|\$ |sudo )/m,
-      'html': /^(<!DOCTYPE|<html)/m,
-      'css': /^([.#][\w-]+\s*{)/m,
-      'sql': /^(SELECT |INSERT )/mi,
-      'java': /^(public class |import java)/m,
-      'cpp': /^(#include |int main)/m
-    };
-    
-    for (const [lang, pattern] of Object.entries(patterns)) {
-      if (pattern.test(code)) return lang;
-    }
-    return 'plaintext';
-  },
-  
-  copyCode(btn, code) {
-    const unescaped = code.replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/\\\\/g, '\\').replace(/\\n/g, '\n');
-    navigator.clipboard.writeText(unescaped).then(() => {
-      btn.classList.add('copied');
-      btn.textContent = '✓ Kopiert!';
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.textContent = '📋 Kopieren';
-      }, 2000);
-    });
-  },
-  
-  copyMessageContent(btn, content) {
-    const unescaped = content.replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/\\\\/g, '\\').replace(/<br>/g, '\n');
-    const div = document.createElement('div');
-    div.innerHTML = unescaped;
-    const text = div.textContent;
-    
-    navigator.clipboard.writeText(text).then(() => {
-      btn.classList.add('copied');
-      btn.innerHTML = '✓ Kopiert!';
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.innerHTML = '📋 Kopieren';
-      }, 2000);
-    });
-  },
-  
-  exportCurrent() {
-    const chat = this.chats.find(c => c.id === this.currentChatId);
-    if (!chat) return;
-    
-    const data = { version: '2.5', type: 'ai-chat-v2', chat };
-    this.downloadJSON(data, `chat-${chat.title.substring(0, 20)}.json`);
-    this.showToast('Chat exportiert');
-  },
-  
-  exportAll() {
-    if (this.chats.length === 0) {
-      this.showToast('Keine Chats zum Exportieren', 'error');
-      return;
-    }
-    
-    const data = {
-      version: '2.5',
-      type: 'ai-chat-v2-all',
-      chats: this.chats,
-      exportDate: new Date().toISOString(),
-      tokenUsage: this.totalTokensUsed
-    };
-    
-    this.downloadJSON(data, `all-chats-${new Date().toISOString().split('T')[0]}.json`);
-    this.showToast(`${this.chats.length} Chats exportiert`);
-  },
-  
-  openImportModal() {
-    document.getElementById('importModal').style.display = 'flex';
-  },
-  
-  closeImportModal() {
-    document.getElementById('importModal').style.display = 'none';
-    document.getElementById('importTextarea').value = '';
-    document.getElementById('fileInput').value = '';
-  },
-  
-  importChats() {
-    const textarea = document.getElementById('importTextarea');
-    const content = textarea.value.trim();
-    
-    if (!content) {
-      this.showToast('Bitte JSON-Daten einfügen oder Datei auswählen', 'error');
-      return;
-    }
-    
-    try {
-      const data = JSON.parse(content);
-      
-      if (data.type === 'ai-chat-v2' && data.chat) {
-        this.importChat(data.chat);
-      } else if (data.type === 'ai-chat-v2-all' && data.chats) {
-        data.chats.forEach(chat => this.importChat(chat));
-        if (data.tokenUsage) {
-          this.totalTokensUsed = data.tokenUsage;
-          this.saveTokenUsage();
-          this.updateTokenDisplay();
-        }
-      } else if (data.messages) {
-        this.importChat(data);
-      } else {
-        throw new Error('Ungültiges Format');
-      }
-      
-      this.closeImportModal();
-      this.saveToStorage();
-      this.renderChatList();
-      this.updateStats();
-      
-      if (this.chats.length > 0 && !this.currentChatId) {
-        this.loadChat(this.chats[0].id);
-      }
-      
-      this.showToast('Import erfolgreich');
-      
-    } catch (e) {
-      this.showToast('Import fehlgeschlagen: ' + e.message, 'error');
-    }
-  },
-  
-  importChat(chatData) {
-    const newChat = {
-      id: this.generateId(),
-      title: chatData.title || 'Importierter Chat',
-      messages: chatData.messages || [],
-      tokenStats: chatData.tokenStats || { input: 0, output: 0 },
-      cost: chatData.cost || 0,
-      createdAt: chatData.createdAt || new Date().toISOString(),
-      modelId: chatData.modelId || this.selectedModel
-    };
-    
-    this.chats.unshift(newChat);
-  },
-  
-  async loadModels() {
-    try {
-      const res = await fetch("http://localhost:3000/models");
-      const data = await res.json();
-      
-      if (data.data?.length > 0) {
-        this.models = data.data;
-        this.renderModelOptions();
-      }
-    } catch (e) {
-      console.error('Fehler beim Laden der Modelle:', e);
-    }
-  },
-  
-  renderModelOptions() {
-    const container = document.getElementById('modelOptions');
-    container.innerHTML = this.models.map(model => `
-      <div class="model-option ${model.id === this.selectedModel ? 'selected' : ''}" onclick="app.selectModel('${model.id}')">
-        ${this.formatModelName(model.id)}
-      </div>
-    `).join('');
-  },
-  
-  selectModel(modelId) {
-    this.selectedModel = modelId;
-    
-    const chat = this.chats.find(c => c.id === this.currentChatId);
-    if (chat) {
-      chat.modelId = modelId;
-      this.saveToStorage();
-    }
-    
-    this.updateModelDisplay();
-    this.renderModelOptions();
-    this.closeModelDropdown();
-  },
-  
-  updateUI() {
-    this.renderChatList();
-    this.updateStats();
-    this.updateModelDisplay();
-    
-    if (this.currentChatId) {
-      this.loadChat(this.currentChatId);
-    }
-  },
-  
-  renderChatList() {
-    const list = document.getElementById('chatList');
-    list.innerHTML = this.chats.map(chat => `
-      <div class="chat-item ${chat.id === this.currentChatId ? 'active' : ''}" onclick="app.loadChat('${chat.id}')">
-        <span class="chat-icon">💬</span>
-        <div class="chat-info">
-          <div class="chat-title">
-            <span class="editable-title" onclick="event.stopPropagation(); app.openRenameModal('${chat.id}')" title="Klicken zum Umbenennen">${chat.title}</span>
-          </div>
-          <div class="chat-meta">
-            <span>${chat.messages.length} Nachrichten</span>
-            <span>${this.formatDate(chat.createdAt)}</span>
-          </div>
-        </div>
-        <div class="chat-actions">
-          <button class="action-btn" onclick="event.stopPropagation(); app.openRenameModal('${chat.id}')" title="Umbenennen">✏️</button>
-          <button class="action-btn" onclick="event.stopPropagation(); app.exportChat('${chat.id}')" title="Exportieren">📤</button>
-          <button class="action-btn" onclick="event.stopPropagation(); app.deleteChat('${chat.id}')" title="Löschen">🗑️</button>
-        </div>
-      </div>
-    `).join('');
-  },
-  
-  updateStats() {
-    const totalChats = this.chats.length;
-    const totalMessages = this.chats.reduce((sum, c) => sum + c.messages.length, 0);
-    const totalTokens = this.chats.reduce((sum, c) => sum + c.tokenStats.input + c.tokenStats.output, 0);
-    const totalCost = this.chats.reduce((sum, c) => sum + (c.cost || 0), 0);
-    
-    document.getElementById('statChats').textContent = totalChats;
-    document.getElementById('statMessages').textContent = totalMessages;
-    document.getElementById('statTokens').textContent = this.formatNumber(totalTokens);
-    document.getElementById('statCost').textContent = '$' + totalCost.toFixed(4);
-  },
-  
-  updateChatCost(chat) {
-    const pricing = this.modelPricing[chat.modelId] || this.modelPricing.default;
-    chat.cost = (chat.tokenStats.input / 1000000) * pricing.input + 
-                (chat.tokenStats.output / 1000000) * pricing.output;
-  },
-  
-  generateId() {
-    return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-  },
-  
-  estimateTokens(text) {
-    return Math.ceil(text.length / 3.8);
-  },
-  
-  formatNumber(num) {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toString();
-  },
-  
-  formatDate(dateStr) {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diff = now - date;
-    
-    if (diff < 3600000) return 'vor ' + Math.floor(diff / 60000) + 'm';
-    if (diff < 86400000) return 'vor ' + Math.floor(diff / 3600000) + 'h';
-    return date.toLocaleDateString('de-DE');
-  },
-  
-  formatModelName(id) {
-    return id.split('/').pop();
-  },
-  
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  },
-  
-  downloadJSON(data, filename) {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  },
-  
-  saveToStorage() {
-    localStorage.setItem('ai-chat-v2.5', JSON.stringify({
-      chats: this.chats,
-      settings: { theme: document.body.dataset.theme || 'dark', autoScroll: this.autoScroll }
-    }));
-  },
-  
-  loadFromStorage() {
-    const saved = localStorage.getItem('ai-chat-v2.5');
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        this.chats = data.chats || [];
-        this.autoScroll = data.settings?.autoScroll ?? true;
-        
-        if (data.settings?.theme === 'light') {
-          document.body.dataset.theme = 'light';
-        }
-        
-        if (this.chats.length > 0) {
-          this.currentChatId = this.chats[0].id;
-        }
-      } catch (e) {}
-    }
-  },
-  
-  toggleTheme() {
-    const themeToggle = document.getElementById('themeToggle');
-    const isLight = document.body.dataset.theme === 'light';
-    
-    document.body.dataset.theme = isLight ? '' : 'light';
-    themeToggle.classList.toggle('active', !isLight);
-    
-    this.saveToStorage();
-  },
-  
-  toggleAutoScroll() {
-    this.autoScroll = !this.autoScroll;
-    document.getElementById('autoScrollToggle').classList.toggle('active', this.autoScroll);
-    this.saveToStorage();
-  },
-  
-  toggleModelDropdown() {
-    this.modelDropdownOpen = !this.modelDropdownOpen;
-    document.getElementById('modelDropdown').classList.toggle('show', this.modelDropdownOpen);
-  },
-  
-  closeModelDropdown() {
-    this.modelDropdownOpen = false;
-    document.getElementById('modelDropdown').classList.remove('show');
-  },
-  
-  filterModels() {
-    const search = document.getElementById('modelSearch').value.toLowerCase();
-    const filtered = this.models.filter(m => 
-      this.formatModelName(m.id).toLowerCase().includes(search)
-    );
-    
-    const container = document.getElementById('modelOptions');
-    container.innerHTML = filtered.map(model => `
-      <div class="model-option ${model.id === this.selectedModel ? 'selected' : ''}" onclick="app.selectModel('${model.id}')">
-        ${this.formatModelName(model.id)}
-      </div>
-    `).join('');
-  },
-  
-  updateModelDisplay() {
-    document.getElementById('selectedModelDisplay').textContent = this.formatModelName(this.selectedModel);
-  },
-  
   autoResize(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
@@ -2254,9 +3124,17 @@ const App = {
     document.getElementById('chatContainer').innerHTML = `
       <div class="welcome-screen">
         <div class="welcome-icon">💬</div>
-        <div class="welcome-title">Willkommen bei <span class="logo-text" style="font-size: 2rem;">AI Chat V2.5</span></div>
+        <div class="welcome-title">Willkommen bei <span class="logo-text" style="font-size: 2rem;">AI Chat V2.7</span></div>
         <p>Wähle ein Modell und starte eine Unterhaltung</p>
         <p style="margin-top: 12px; font-size: 0.85rem;">🪙 Freemium: 1.000.000 Tokens kostenlos</p>
+        <div class="welcome-actions">
+          <button class="welcome-btn" onclick="app.createChat()">
+            <span>➕</span> Neuer Chat
+          </button>
+          <button class="welcome-btn" onclick="app.showShortcuts()">
+            <span>⌨️</span> Tastenkürzel
+          </button>
+        </div>
       </div>
     `;
   },
@@ -2294,24 +3172,44 @@ const App = {
     container.scrollTop = container.scrollHeight;
   },
   
-  showToast(message, type = 'success') {
+  showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const id = 'toast-' + Date.now();
+    
+    const icons = {
+      success: '✓',
+      error: '✕',
+      warning: '⚠',
+      info: 'ℹ'
+    };
+    
     const toast = document.createElement('div');
+    toast.id = id;
     toast.className = `toast ${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    toast.innerHTML = `
+      <span class="toast-icon">${icons[type] || 'ℹ'}</span>
+      <span class="toast-content">${message}</span>
+      <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.remove();
+    }, 4000);
   },
   
   exportChat(chatId) {
     const chat = this.chats.find(c => c.id === chatId);
     if (!chat) return;
     
-    const data = { version: '2.5', type: 'ai-chat-v2', chat };
+    const data = { version: '2.7', type: 'ai-chat-v2', chat };
     this.downloadJSON(data, `chat-${chat.title.substring(0, 20)}.json`);
-    this.showToast('Chat exportiert');
+    this.showToast('Chat exportiert', 'success');
   }
 };
 
+// Initialize
 window.app = App;
 App.init();
 </script>

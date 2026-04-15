@@ -1,60 +1,219 @@
-# <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Robot.png" alt="Robot" width="30" height="30" /> AI Chat • Intelligenter Assistent
+# 🤖 AI Chat • Intelligenter Assistent
 
-*Ein moderner, KI-gestützter Chat-Assistent mit Streaming, Code-Highlighting und Freemium-Token-System*
+Ein moderner, KI-gestützter Chat-Assistent mit Streaming-Unterstützung, Code-Highlighting und Freemium-Token-System.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/version-2.1.0-6366f1?style=for-the-badge" alt="Version">
-  <img src="https://img.shields.io/badge/node-%3E%3D18.0.0-10b981?style=for-the-badge" alt="Node">
-  <img src="https://img.shields.io/badge/license-MIT-f59e0b?style=for-the-badge" alt="License">
-  <img src="https://img.shields.io/badge/Groq-API-8b5cf6?style=for-the-badge" alt="Groq">
-</p>
+![Version](https://img.shields.io/badge/version-2.1.0-blue)
+![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
+![License](https://img.shields.io/badge/license-MIT-orange)
 
-<br>
+---
 
-## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Star.png" alt="Star" width="25" height="25" /> Features
-
-<table>
-<tr>
-<td width="50%">
+## ✨ Features
 
 ### 🎨 Benutzeroberfläche
-- `Dark/Light Mode` • Smooth Animation
-- `Responsive Design` • Mobile & Desktop
-- `Glassmorphism UI` • Moderne Ästhetik
-- `Sidebar` • Verlauf & Statistiken
+- Dark/Light Mode - Umschaltbar mit Smooth-Animation
+- Responsive Design - Optimiert für Desktop, Tablet & Mobile
+- Modernes UI - Glassmorphism, Gradienten & Animationen
+- Sidebar - Chat-Verlauf, Statistiken & Einstellungen
 
-### 💬 Chat-Funktionen  
-- `Streaming` • Echtzeit-Generierung
-- `Code-Highlighting` • 20+ Sprachen
-- `Markdown` • Tabellen & Formatierung
-- `Token-Tracking` • Live-Verbrauch
+### 💬 Chat-Funktionen
+- Streaming-Antworten - Echtzeit-Textgenerierung (optional)
+- Code-Highlighting - Syntax-Hervorhebung für 20+ Sprachen
+- Markdown-Unterstützung - Tabellen, Zitate, Listen & mehr
+- Token-Zähler - Live-Tracking des Token-Verbrauchs
+- Chat-Verlauf - Alle Chats werden lokal gespeichert
+- Export/Import - Chats als JSON sichern & wiederherstellen
 
-</td>
-<td width="50%">
+### 🔧 Technische Features
+- Groq API Integration - Schnelle LLM-Inferenz
+- Rate Limiting - Schutz vor Überlastung
+- Model-Caching - 30 Sekunden Cache für bessere Performance
+- Health Check - Server-Status live überwachbar
 
-### 🔧 Technisch
-- `Groq API` • Schnelle Inferenz
-- `Rate Limiting` • DDoS-Schutz
-- `Model-Caching` • 30s TTL
-- `Health Check` • Server-Monitoring
+### 🪙 Freemium-System
+- 1.000.000 Tokens kostenlos
+- Token-Tracking mit Fortschrittsbalken
+- Warnungen bei 75% und 90% Verbrauch
 
-### 🪙 Freemium
-- `1M Tokens` • Kostenlos
-- `Progress-Bar` • Visuelles Tracking
-- `Warnungen` • 75% / 90%
-- `Export/Import` • JSON Backup
+---
 
-</td>
-</tr>
-</table>
+## 🚀 Schnellstart
 
-<br>
+### Voraussetzungen
+- Node.js >= 18.0.0 (https://nodejs.org/)
+- Groq API Key (https://console.groq.com)
 
-## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Gear.png" alt="Gear" width="25" height="25" /> Schnellstart
+### Installation
 
-### 📋 Voraussetzungen
+# 1. Repository klonen
+git clone https://github.com/DEIN_USERNAME/ai-chat.git
+cd ai-chat
 
-```yaml
-📦 Node.js : >= 18.0.0
-🔑 Groq API Key : https://console.groq.com
-🌐 Browser : Chrome / Firefox / Safari
+# 2. Abhängigkeiten installieren
+npm install
+
+# 3. .env Datei erstellen
+cp .env.example .env
+# Jetzt GROQ_API_KEY in die .env Datei eintragen!
+
+# 4. Server starten
+npm run dev
+
+### Verwendung
+1. Server läuft auf http://localhost:3000
+2. Öffne index.html im Browser (Doppelklick)
+3. Wähle ein Modell aus der Dropdown-Liste
+4. Starte eine Unterhaltung!
+
+---
+
+## 📁 Projektstruktur
+
+ai-chat/
+├── index.html          # Frontend-Anwendung
+├── server.js           # Express-Backend
+├── package.json        # Node.js Abhängigkeiten
+├── .env                # Umgebungsvariablen (nicht im Git!)
+├── .env.example        # Vorlage für .env
+└── README.md           # Diese Datei
+
+---
+
+## ⚙️ Konfiguration
+
+### .env Datei
+
+# Groq API Key (erforderlich)
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Server Port (optional, default: 3000)
+PORT=3000
+
+# Erlaubte Origins für CORS (kommagetrennt)
+ALLOWED_ORIGINS=http://localhost:5500,http://127.0.0.1:5500,http://localhost:3000,null
+
+# Admin Secret für Cache-Admin-Funktionen
+ADMIN_SECRET=mein-geheimes-passwort-123
+
+# Umgebung
+NODE_ENV=development
+
+### Verfügbare Modelle
+
+| Modell | Kontext | Beschreibung |
+|--------|---------|--------------|
+| llama-3.3-70b-versatile | 128K | Vielseitiges 70B Modell |
+| llama-3.1-8b-instant | 128K | Schnelles 8B Modell |
+| mixtral-8x7b-32768 | 32K | Mixtral MoE Modell |
+| gemma2-9b-it | 8K | Google's Gemma 2 |
+
+---
+
+## 📡 API Endpoints
+
+| Methode | Endpoint | Beschreibung |
+|---------|----------|--------------|
+| GET | / | Server-Informationen |
+| GET | /health | Health Check & Status |
+| GET | /models | Alle verfügbaren Modelle |
+| GET | /models/:id | Details zu einem Modell |
+| POST | /chat | Chat-Anfrage (normal) |
+| POST | /chat/stream | Chat-Anfrage (streaming) |
+| POST | /chat/title | Chat-Titel generieren |
+| POST | /tokens/estimate | Token-Schätzung |
+| POST | /cache/clear | Cache leeren (Admin) |
+
+### Beispiel: Chat-Anfrage
+
+const response = await fetch('http://localhost:3000/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    message: "Erkläre mir Quantenphysik",
+    model: "llama-3.3-70b-versatile",
+    history: []
+  })
+});
+
+const data = await response.json();
+console.log(data.choices[0].message.content);
+
+---
+
+## ⌨️ Tastenkürzel
+
+| Tastenkombination | Aktion |
+|-------------------|--------|
+| Enter | Nachricht senden |
+| Shift + Enter | Neue Zeile |
+| Ctrl + K | Neuer Chat |
+| Ctrl + F | Chats durchsuchen |
+| Ctrl + E | Chat exportieren |
+| Ctrl + Shift + L | Chat leeren |
+| Ctrl + / | Tastenkürzel anzeigen |
+| ESC | Menüs schließen |
+
+---
+
+## 🔧 Verfügbare Scripts
+
+# Server starten (Produktion)
+npm start
+
+# Server starten (Entwicklung mit Auto-Reload)
+npm run dev
+
+# Server mit Production-Umgebung starten
+npm run prod
+
+---
+
+## 🐛 Fehlerbehebung
+
+| Problem | Lösung |
+|---------|--------|
+| "npm wird nicht erkannt" | Node.js installieren & PC neu starten |
+| "Error: Cannot find module" | npm install ausführen |
+| "GROQ_API_KEY fehlt" | .env Datei mit API-Key erstellen |
+| Server startet nicht | Port 3000 prüfen oder PORT in .env ändern |
+| "Failed to fetch" | Server läuft nicht - npm run dev ausführen |
+| Chat antwortet nicht | Groq API-Key gültig? |
+
+---
+
+## 🏗️ Technologie-Stack
+
+### Frontend
+- Vanilla JavaScript (ES6+)
+- CSS3 (Custom Properties, Grid, Flexbox)
+- Highlight.js
+
+### Backend
+- Node.js + Express
+- Groq SDK
+- Helmet + Rate Limit + Compression
+
+---
+
+## 📄 Lizenz
+
+MIT License - Siehe LICENSE für Details.
+
+---
+
+## 👤 Autor
+
+Dein Name
+- GitHub: @DEIN_USERNAME
+- Twitter: @DEIN_TWITTER
+
+---
+
+## ⭐ Danksagungen
+
+- Groq - Für die schnelle LLM-API
+- Highlight.js - Syntax-Highlighting
+
+---
+
+⭐ Wenn dir dieses Projekt gefällt, gib ihm einen Stern!

@@ -20,8 +20,8 @@ https://git-scm.com/downloads
 
 ### 1️⃣ Repository klonen
 ```bash
-git clone https://github.com/DEIN_USERNAME/ai-chat-server.git
-cd ai-chat-server
+git clone https://github.com/DEIN_USERNAME/ai-chat-server.git](https://github.com/lzhenwei76-beep/ChatBot.git
+cd ChatBot
 ```
 
 ---

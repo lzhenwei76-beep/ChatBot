@@ -15,8 +15,8 @@ https://git-scm.com/downloads
 
 ### 1. Repository klonen
 ```bash
-git clone https://github.com/DEIN_USERNAME/ai-chat.git
-cd ai-chat
+git clone https://github.com/lzhenwei76-beep/ChatBot.git
+cd ChatBot
 ```
 
 ### 2. Abhängigkeiten installieren
@@ -28,6 +28,7 @@ npm install
 ```bash
 cp .env.example .env
 ```
+Info: Hier ist es kein muss. Nur wenn du dein eigens GROQ API GEY haben willst.
 
 ### 4. API Key eintragen
 
